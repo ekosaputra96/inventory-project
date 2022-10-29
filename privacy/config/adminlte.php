@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'title' => 'Front Sistem',
+    'title' => 'Inventory System',
 
     'title_prefix' => '',
 
@@ -30,9 +30,9 @@ return [
     |
     */
 
-    'logo' => '<b>Inventory&nbsp</b><b>System</b>',
+    'logo' => '<b>Inventory&nbsp System</b>',
 
-    'logo_mini' => '<b>IV</b><b>S</b>',
+    'logo_mini' => '<b>GUI</b>',
 
     /*
     |--------------------------------------------------------------------------
@@ -45,7 +45,7 @@ return [
     |
     */
 
-    'skin' => 'purple-light',
+    'skin' => 'blue-light',
 
     /*
     |--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ return [
     |
     */
 
-    'layout' => null,
+    'layout' => 'fixed',
 
     /*
     |--------------------------------------------------------------------------
@@ -110,52 +110,185 @@ return [
     'menu' => [
         'MAIN NAVIGATION',
 
-        // [
-        //     'text' => 'Permintaan',
-        //     'url'  => 'admin/permintaan',
-        //     'icon' => 'pencil-square-o',
-        //     // 'can'  => 'manage-blog',
-        // ],
-
-        // [
-        //     'text' => 'Memo',
-        //     'url'  => 'admin/memo',
-        //     'icon' => 'check-square-o',
-        //     // 'can'  => 'manage-blog',
-        // ],
-
         [
-            'text' => 'Pemakaian',
-            'url'  => 'admin/pemakaian',
-            'icon' => 'arrow-circle-up',
-            'permission'  => 'create-users',
-        ],
+            'text' => 'Setup',
+            'icon' => 'wrench',
+            'permission' => 'read-setup',
+            'submenu' => [
+                [
+                    'text' => 'Company',
+                    'url'  => 'admin/company',
+                    'icon' => 'group',
+                    'permission' => 'read-company',
+                ],
 
-        [
-            'text' => 'Pembelian',
-            'url'  => 'admin/pembelian',
-            'icon' => 'cart-arrow-down',
-            // 'can'  => 'manage-blog',
-        ],
+                [
+                    'text' => 'Company 1',
+                    'url'  => 'admin/company1',
+                    'icon' => 'group',
+                    'permission' => 'read-company',
+                ],
 
-        [
-            'text' => 'Penerimaan',
-            'url'  => 'admin/penerimaan',
-            'icon' => 'arrow-circle-down',
-            // 'can'  => 'manage-blog',
-        ],
+                [
+                    'text' => 'Lokasi',
+                    'url'  => 'admin/masterlokasi',
+                    'icon' => 'map-marker',
+                    'permission'  => 'read-lokasi',
+                ],
 
-        [
-            'text' => 'Adjusment/Penyesuaian',
-            'url'  => 'admin/adjustment',
-            'icon' => 'arrow-circle-down',
-            // 'can'  => 'manage-blog',
+                [
+                    'text'        => 'Catatan Khusus PO',
+                    'url'         => 'admin/catatanpo',
+                    'icon'        => 'sticky-note',
+                    'permission' => 'read-catatanpo',
+                ],
+
+                [
+                    'text'        => 'No Transaksi Setup',
+                    'url'         => 'admin/transaksisetup',
+                    'icon'        => 'tags',
+                    'permission' => 'read-transaksisetup',
+                ],
+
+                [
+                    'text'        => 'Tax Setup',
+                    'url'         => 'admin/taxsetup',
+                    'icon'        => 'line-chart',
+                    'permission' => 'read-taxsetup',
+                ],
+
+                [
+                    'text'        => 'Signature',
+                    'url'         => 'admin/signature',
+                    'icon'        => 'pencil-square',
+                    'permission' => 'read-signature',
+                ],
+                
+                [
+                    'text'        => 'Setup Akses Transaksi',
+                    'url'         => 'admin/setupakses',
+                    'icon'        => 'group',
+                ],
+                
+                [
+                    'text'        => 'Setup Folder',
+                    'url'         => 'admin/setupfolder',
+                    'icon'        => 'group',
+                ],
+            ]
         ],
 
         [
             'text' => 'Master Data',
             'icon' => 'server',
+            'permission' => 'read-masterdata',
             'submenu' => [
+                // [
+                //     'text' => 'Katalog',
+                //     'url'  => 'admin/katalog',
+                //     'icon' => 'columns',
+                //     'permission'  => 'read-katalog',
+                // ],
+
+                // [
+                //     'text' => 'Lokasi Rak',
+                //     'url'  => 'admin/lokasirak',
+                //     'icon' => 'tags',
+                //     'permission'  => 'read-lokasirak',
+                // ],  
+
+                [
+                    'text' => 'Jasa',
+                    'url'  => 'admin/jasa',
+                    'icon' => 'male',
+                    'permission'  => 'read-jasa',
+                    
+                ],
+                
+                [
+                    'text' => 'Non-Stock',
+                    'url'  => 'admin/nonstock',
+                    'icon' => 'ban',
+                    'permission'  => 'read-nonstock',
+                    
+                ],
+
+                [
+                    'text' => 'Alat',
+                    'url'  => 'admin/alat',
+                    'icon' => 'cog',
+                    'permission'  => 'read-alat',
+                ],
+
+                 [
+                    'text' => 'Kapal',
+                    'url'  => 'admin/kapal',
+                    'icon' => 'ship',
+                    'permission'  => 'read-kapal',
+                ],
+
+                [
+                    'text' => 'Jenis Mobil',
+                    'url'  => 'admin/jenismobil',
+                    'icon' => 'road',
+                    'permission'  => 'read-jenismobil',
+                ],
+
+                [
+                    'text' => 'Mobil',
+                    'url'  => 'admin/mobil',
+                    'icon' => 'car',
+                    'permission'  => 'read-mobil',
+                ],
+
+                [
+                    'text' => 'Vendor',
+                    'url'  => 'admin/vendor',
+                    'icon' => 'truck',
+                    'permission'  => 'read-vendor',
+                ],
+
+                [
+                    'text' => 'Customer',
+                    'url'  => 'admin/customer',
+                    'icon' => 'female',
+                    'permission'=>'read-customer',
+                ],
+
+                [
+                    'text' => 'Kategori Produk',
+                    'url'  => 'admin/kategoriproduk',
+                    'icon' => 'tasks',
+                    'permission'  => 'read-kategori',
+                ],
+                
+                [
+                    'text' => 'Unit',
+                    'url'  => 'admin/unit',
+                    'icon' => 'briefcase',
+                    'permission'  => 'read-unit',
+                ],
+
+                [
+                    'text' => 'Ukuran',
+                    'url'  => 'admin/ukuran',
+                    'icon' => 'cogs',
+                    'permission'  => 'read-ukuran',
+                ],
+
+                [
+                    'text'        => 'Merek',
+                    'url'         => 'admin/merek',
+                    'icon'        => 'building',
+                    'permission'  => 'read-merek',
+                ],
+
+                [
+                    'text' => 'Satuan',
+                    'url'  => 'admin/satuan',
+                    'icon' => 'wrench',
+                    'permission'  => 'read-satuan',
+                ],
 
                 [
                     'text' => 'Produk',
@@ -163,103 +296,382 @@ return [
                     'icon' => 'briefcase',
                     'permission'  => 'read-produk',
                 ],
-              
+
                 [
-                    'text' => 'Vendor',
-                    'url'  => 'admin/vendor',
-                    'icon' => 'truck',
-                    // 'can'  => 'manage-blog',
+                    'text' => 'Produk 1',
+                    'url'  => 'admin/produk1',
+                    'icon' => 'briefcase',
+                    'active' => ['admin/produk1','admin/produk1/detail', 'admin/produk1/detail/*'],
+                    'permission'  => 'read-produk',
                 ],
 
                 [
-                    'text' => 'Company',
-                    'url'  => 'admin/company',
-                    'icon' => 'group',
-                    // 'can'  => 'manage-blog',
-                ],
-
-                [
-                    'text' => 'Kategori Produk',
-                    'url'  => 'admin/kategoriproduk',
-                    'icon' => 'tasks',
-                    // 'can'  => 'manage-blog',
-                ],
-
-                [
-                    'text'        => 'Merek',
-                    'url'         => 'admin/merek',
-                    'icon'        => 'building',
-                    // 'label'       => 4,
-                    // 'label_color' => 'success',
-                ],
-
-                [
-                    'text' => 'Ukuran',
-                    'url'  => 'admin/ukuran',
-                    'icon' => 'cogs',
-                    // 'can'  => 'manage-blog',
-                ],
-
-                [
-                    'text' => 'Satuan',
-                    'url'  => 'admin/satuan',
-                    'icon' => 'wrench',
-                    // 'can'  => 'manage-blog',
-                ],
-
-                [
-                    'text' => 'Lokasi',
-                    'url'  => 'admin/masterlokasi',
-                    'icon' => 'map-marker',
-                    // 'can'  => 'manage-blog',
+                    'text' => 'Konversi',
+                    'url'  => 'admin/konversi',
+                    'icon' => 'exchange',
+                    'permission'  => 'read-konversi',
                 ],
             ]
+
         ],
+
+        [
+            'text' => 'Transaksi',
+            'icon' => 'th-list',
+            'permission'  => 'read-transaksi',
+            'submenu' => [
+                
+                [
+                    'text' => 'Permintaan Kasbon',
+                    'url'  => 'admin/kasbon',
+                    'icon' => 'hand-paper-o',
+                    'permission'  => 'read-kasbon',
+                ],
+                
+                [
+                    'text' => 'NPPB',
+                    'url'  => 'admin/memo',
+                    'icon' => 'sticky-note',
+                    'permission'  => 'read-memo',
+                ],
+
+                [
+                    'text' => 'Request Pembelian',
+                    'url'  => 'admin/requestpembelian',
+                    'icon' => 'newspaper-o',
+                    'permission'  => 'read-requestbeli',
+                ],
+
+                [
+                    'text' => 'Pembelian',
+                    'url'  => 'admin/pembelian',
+                    'icon' => 'cart-arrow-down',
+                    'permission'  => 'read-pembelian',
+                ],
+
+                [
+                    'text' => 'Penerimaan',
+                    'url'  => 'admin/penerimaan',
+                    'icon' => 'sign-in',
+                    'permission'  => 'read-penerimaan',
+                ],
+                
+                [
+                    'text' => 'Work Order',
+                    'url'  => 'admin/workorder',
+                    'icon' => 'cart-arrow-down',
+                    'permission'  => 'read-workorder',
+                ],
+
+                [
+                    'text' => 'Pemakaian',
+                    'url'  => 'admin/pemakaian',
+                    'icon' => 'sign-out',
+                    'permission'  => 'read-pemakaian',
+                ],
+
+                [
+                    'text' => 'Pemakaian Ban',
+                    'url'  => 'admin/pemakaianban',
+                    'icon' => 'dot-circle-o',
+                    'permission'  => 'read-pemakaianban',
+                ],
+
+                // [
+                //     'text' => 'Penjualan',
+                //     'url'  => 'admin/penjualan',
+                //     'icon' => 'money',
+                //     'permission'  => 'read-penjualan',
+                // ],
+
+                [
+                    'text' => 'Transfer Out',
+                    'url'  => 'admin/transfer',
+                    'icon' => 'minus',
+                    'permission'  => 'read-transferout',
+                ],
+
+                [
+                    'text' => 'Transfer In',
+                    'url'  => 'admin/transferin',
+                    'icon' => 'plus',
+                    'permission'  => 'read-transferin',
+                ],
+
+                [
+                    'text' => 'Adjusment/Penyesuaian',
+                    'url'  => 'admin/adjustment',
+                    'icon' => 'check-square-o',
+                    'permission'  => 'read-adjustment',
+                ],
+
+
+                [
+                    'text' => 'Stok Opname',
+                    'url'  => 'admin/opname',
+                    'icon' => 'check-square',
+                    'permission'  => 'read-opname',
+                ],
+
+                [
+                    'text' => 'Retur Pembelian',
+                    'url'  => 'admin/returpembelian',
+                    'icon' => 'mail-reply-all',
+                    'permission'  => 'read-returpembelian',
+                ],
+                
+                [
+                    'text' => 'Retur Pemakaian',
+                    'url'  => 'admin/returpemakaian',
+                    'icon' => 'mail-reply-all',
+                    'permission'  => 'read-returpembelian',
+                ],
+
+                [
+                    'text' => 'Disassembling',
+                    'url'  => 'admin/disassembling',
+                    'icon' => 'random',
+                    'permission'  => 'read-disassembling',
+                ],
+
+                [
+                    'text' => 'Assembling',
+                    'url'  => 'admin/assembling',
+                    'icon' => 'recycle',
+                    'permission'  => 'read-assembling',
+                ],
+
+                // [
+                //     'text' => 'Retur Pemakaian',
+                //     'url'  => 'admin/returpakai',
+                //     'icon' => 'history',
+                // ],
+
+                [
+                    'text' => 'Retur Penjualan',
+                    'url'  => 'admin/returjual',
+                    'icon' => 'history',
+                    'permission'  => 'read-returjual',
+                ],
+
+            ]
+        ],
+
         [
             'text' => 'Laporan',
             'icon' => 'folder-open',
+            'permission' => 'read-laporan',
             'submenu' => [
 
                 [
-                    'text'        => 'Laporan',
-                    'url'         => 'admin/stock/index',
+                    'text'        => 'Laporan Data Produk',
+                    'url'         => 'admin/laporanproduk',
                     'icon'        => 'bar-chart',
-                    // 'label'       => 4,
-                    // 'label_color' => 'success',
-                ]
+                    'permission'  => 'read-laporanproduk',
+                ],
+
+                [
+                    'text'        => 'Laporan Kartu Stok',
+                    'url'         => 'admin/kartustok',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-kartustok',
+                ],
+
+                [
+                    'text'        => 'Laporan Pembelian',
+                    'url'         => 'admin/laporanpembelian',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpembelian',
+                ],
+
+                [
+                    'text'        => 'Laporan Retur Pembelian',
+                    'url'         => 'admin/laporanreturpembelian',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanreturpembelian',
+                ],
+                
+                [
+                    'text'        => 'Laporan Penerimaan',
+                    'url'         => 'admin/laporanpenerimaan',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpenerimaan',
+                ],
+                
+                [
+                    'text'        => 'Laporan Pemakaian Per Produk',
+                    'url'         => 'admin/laporanpemakaianproduk',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpemakaian',
+                ],
+
+                [
+                    'text'        => 'Laporan Pemakaian',
+                    'url'         => 'admin/laporanpemakaian',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpemakaian',
+                ],
+                
+                [
+                    'text'        => 'Report Maintenance Record',
+                    'url'         => 'admin/laporanmaintenance',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpemakaian',
+                ],
+
+                [
+                    'text'        => 'Laporan QTY Pemakaian',
+                    'url'         => 'admin/laporanpemakaianqty',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpemakaian',
+                ],
+
+                [
+                    'text'        => 'Laporan Pemakaian Ban',
+                    'url'         => 'admin/laporanpemakaianban',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpemakaianban',
+                ],
+
+                [
+                    'text'        => 'Laporan Penjualan',
+                    'url'         => 'admin/laporanpenjualan',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanpenjualan',
+                ],
+
+                [
+                    'text'        => 'Laporan Retur Penjualan',
+                    'url'         => 'admin/laporanreturpenjualan',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanreturpenjualan',
+                ],
+
+                [
+                    'text'        => 'Laporan Transfer In',
+                    'url'         => 'admin/laporantransferin',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporantransferin',
+                ],
+
+                [
+                    'text'        => 'Laporan Transfer Out',
+                    'url'         => 'admin/laporantransferout',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporantransferout',
+                ],
+
+                [
+                    'text'        => 'Laporan Adjusment',
+                    'url'         => 'admin/laporanadjustment',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanadjustment',
+                ],
+
+                [
+                    'text'        => 'Laporan Opname',
+                    'url'         => 'admin/laporanopname',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanopname',
+                ],
+
+                [
+                    'text'        => 'Laporan Produk Bulanan',
+                    'url'         => 'admin/laporanprodukbulanan',
+                    'icon'        => 'bar-chart',
+                    'permission'  => 'read-laporanprodukbulanan',
+                ],
             ]
         ],
 
-        // [
-        //     'text'        => 'Vendor',
-        //     'url'         => 'admin/hasil-tambak',
-        //     'icon'        => 'user-circle',
-        //     // 'label'       => 4,
-        //     // 'label_color' => 'success',
-        // ],
+        [
+            'text' => 'Utility',
+            'icon' => 'calendar-check-o',
+            'permission' => 'read-utility',
+            'submenu' => [
+
+                [
+                    'text'        => 'End Of Month',
+                    'url'         => 'admin/endofmonth',
+                    'icon'        => 'file-text',
+                    'permission'  => 'read-endofmonth',
+                ],
+                
+                [
+                    'text'        => 'EOM per Part (Big Data)',
+                    'url'         => 'admin/endofmonthpart',
+                    'icon'        => 'file-text',
+                    'permission'  => 'read-endofmonthpart',
+                ],
+
+                [
+                    'text'        => 'Re-Open | Re-Open Close',
+                    'url'         => 'admin/reopen',
+                    'icon'        => 'folder-open-o',
+                    'permission'  => 'read-reopen',
+                ],
+            ]
+        ],
         
+        
+        [
+            'text' => 'Re-Calculate',
+            'icon' => 'check',
+            'permission'  => 'read-recalculate',
+            'submenu' => [
+
+                [
+                    'text'        => 'Calculate Monthly',
+                    'url'         => 'admin/checkmonthly',
+                    'icon'        => 'check-circle-o',
+                ],
+                
+                [
+                    'text'        => 'Calculate Monthly (Per Part)',
+                    'url'         => 'admin/checkmonthlypart',
+                    'icon'        => 'check-circle-o',
+                ],
+
+                // [
+                //     'text'        => 'Calculate Penerimaan',
+                //     'url'         => 'admin/checkpenerimaan',
+                //     'icon'        => 'check-circle',
+                // ],
+
+                // [
+                //     'text'        => 'Calculate Pemakaian',
+                //     'url'         => 'admin/checkpemakaian',
+                //     'icon'        => 'check-square-o',
+                // ],
+
+                // [
+                //     'text'        => 'Calculate Pemakaian Ban',
+                //     'url'         => 'admin/checkpemakaianban',
+                //     'icon'        => 'check-square',
+                // ],
+
+                // [
+                //     'text'        => 'Calculate Penjualan',
+                //     'url'         => 'admin/checkpenjualan',
+                //     'icon'        => 'check-circle-o',
+                // ],
+
+                // [
+                //     'text'        => 'ReCalculate Pemakaian',
+                //     'url'         => 'admin/recalculatepemakaian',
+                //     'icon'        => 'calculator',
+                //     'permission'  => 'read-recalculate',
+                // ],
+            ]
+        ],
+
 
         'ACCOUNT SETTINGS',
         [
-            'text' => 'Users',
+            'text' => 'Users | Roles | Permissions',
             'url'  => 'admin/users',
             'icon' => 'user',
             'permission' => 'read-users'
-
-        ],
-        [
-            'text' => 'Roles & Permissions',
-            'icon' => 'gear',
-            'submenu' => [
-                [
-                    'text'  => 'Roles',
-                    'route'   => 'roles.index'
-                ],
-                [
-                    'text'  => 'Permissions',
-                    'route'   => 'permissions.index'
-                ]
-            ]
 
         ],
     ],

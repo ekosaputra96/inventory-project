@@ -6,6 +6,10 @@ use App\DataTables\RolesDataTable;
 use App\Role;
 use Illuminate\Http\Request;
 use App\Permission;
+use App\Models\tb_akhir_bulan;
+use App\Models\MasterLokasi;
+use App\Models\Company;
+use Carbon;
 
 class RolesController extends Controller
 {
@@ -14,11 +18,43 @@ class RolesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function konek()
+    {
+        $compa2 = auth()->user()->kode_company;
+        $compa = substr($compa2,0,2);
+        if ($compa == '01'){
+            $koneksi = 'mysqldepo';
+        }else if ($compa == '02'){
+            $koneksi = 'mysqlpbm';
+        }else if ($compa == '03'){
+            $koneksi = 'mysqlemkl';
+        }else if ($compa == '22'){
+            $koneksi = 'mysqlskt';
+        }else if ($compa == '04'){
+            $koneksi = 'mysqlgut';
+        }else if ($compa == '05'){
+            $koneksi = 'mysql';
+        }else if ($compa == '06'){
+            $koneksi = 'mysqlinfra';
+        }
+        return $koneksi;
+    }
+    
     public function index(RolesDataTable $dataTable)
     {
+        $konek = self::konek();
         $create_url = route('roles.create');
 
-        return $dataTable->render('admin.roles.index',compact('create_url'));
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
+
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
+
+        return $dataTable->render('admin.roles.index',compact('create_url','period', 'nama_lokasi','nama_company'));
     }
 
     /**
@@ -28,14 +64,22 @@ class RolesController extends Controller
      */
     public function create()
     {
+        $konek = self::konek();
         $info['list_url'] = route('roles.index');
         $info['title'] = 'Create new role';
         $permissions = Permission::all();
 
 //        dd($permissions->groupBy('tab'));
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
 
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
 
-        return view('admin.roles.create', compact('info','permissions'));
+        return view('admin.roles.create', compact('info','permissions','period', 'nama_lokasi','nama_company'));
     }
 
     /**
@@ -79,14 +123,23 @@ class RolesController extends Controller
      */
     public function edit(Role $role)
     {
+        $konek = self::konek();
         $info['list_url'] = route('roles.index');
         $info['title'] = 'Edit role : '. $role->name;
         $permissions = Permission::all();
         $get_permission = $role->permissions()->pluck('name','name');
 
 //        dd([array_has($get_permission->toArray(), 'create-users'), $get_permission->toArray()]);
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
 
-        return view('admin.roles.edit', compact('role','info', 'permissions', 'get_permission'));
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
+
+        return view('admin.roles.edit', compact('role','info', 'permissions', 'get_permission','period', 'nama_lokasi','nama_company'));
     }
 
     /**
@@ -113,7 +166,7 @@ class RolesController extends Controller
             $message = [
                 'success' => true,
                 'title' => 'Hapus',
-                'message' => 'Selamat! Data ['.$role->name.'] berhasil diupdate.'
+                'message' => 'Role ['.$role->name.'] berhasil diupdate.'
             ];
             return response()->json($message);
 
@@ -121,7 +174,7 @@ class RolesController extends Controller
             $message = [
                 'success' => false,
                 'title' => 'Hapus',
-                'message' => 'Maaf! Data gagal diupdate.'. $exception
+                'message' => 'Role gagal diupdate.'. $exception
             ];
 
             \Log::error($exception);
@@ -144,7 +197,7 @@ class RolesController extends Controller
             $message = [
                 'success' => true,
                 'title' => 'Update',
-                'message' => 'Selamat! Data ['.$role->name.'] berhasil dihapus.'
+                'message' => 'Role ['.$role->name.'] berhasil dihapus.'
             ];
             return response()->json($message);
 
@@ -152,7 +205,7 @@ class RolesController extends Controller
             $message = [
                 'success' => false,
                 'title' => 'Update',
-                'message' => 'Maaf! Data gagal dihapus.'
+                'message' => 'Role gagal dihapus.'
             ];
             return response()->json($message);
         }

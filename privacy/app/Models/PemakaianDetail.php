@@ -15,16 +15,17 @@ class PemakaianDetail extends Model
 
     protected $table = 'pemakaian_detail';
 
-	// protected $primaryKey = 'no_permintaan';
+    public $incrementing = false;
 
-	public $incrementing = false;
-
-	protected $fillable = [
-    	'no_pemakaian',
+    protected $fillable = [
+        'no_pemakaian',
         'kode_produk',
+        'partnumber',
         'kode_satuan',
         'qty',
+        'qty_retur',
         'harga',
+        'keterangan',
     ];
 
     protected $appends = ['destroy_url','edit_url'];
@@ -57,5 +58,21 @@ class PemakaianDetail extends Model
     public function getUpdateUrlAttribute()
     {
         return route('pemakaiandetail.update',$this->id);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($query){
+            $query->kode_lokasi = Auth()->user()->kode_lokasi;
+            $query->kode_company = Auth()->user()->kode_company;
+            $query->created_by = Auth()->user()->name;
+            $query->updated_by = Auth()->user()->name;
+        });
+
+        static::updating(function ($query){
+           $query->updated_by = Auth()->user()->name;
+        });
     }
 }

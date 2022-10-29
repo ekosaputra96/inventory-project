@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Permission;
 use Illuminate\Http\Request;
+use App\Models\tb_akhir_bulan;
+use App\Models\MasterLokasi;
+use App\Models\Company;
+use Carbon;
 
 class PermissionsController extends Controller
 {
@@ -12,12 +16,47 @@ class PermissionsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    
+    public function konek()
+    {
+        $compa2 = auth()->user()->kode_company;
+        $compa = substr($compa2,0,2);
+        if ($compa == '01'){
+            $koneksi = 'mysqldepo';
+        }else if ($compa == '02'){
+            $koneksi = 'mysqlpbm';
+        }else if ($compa == '99'){
+            $koneksi = 'mysqlpbmlama';
+        }else if ($compa == '03'){
+            $koneksi = 'mysqlemkl';
+        }else if ($compa == '22'){
+            $koneksi = 'mysqlskt';
+        }else if ($compa == '04'){
+            $koneksi = 'mysqlgut';
+        }else if ($compa == '05'){
+            $koneksi = 'mysql';
+        }else if ($compa == '06'){
+            $koneksi = 'mysqlinfra';
+        }
+        return $koneksi;
+    }
+    
     public function index()
     {
+        $konek = self::konek();
         $create_url = route('permissions.create');
         $permissions = Permission::all();
 
-        return view('admin.permissions.index',compact('create_url'))->withPermissions($permissions);
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
+
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
+
+        return view('admin.permissions.index',compact('create_url','period', 'nama_lokasi','nama_company'))->withPermissions($permissions);
     }
 
     /**
@@ -27,10 +66,20 @@ class PermissionsController extends Controller
      */
     public function create()
     {
+        $konek = self::konek();
         $info['list_url'] = route('permissions.index');
         $info['title'] = 'Create New Permission';
 
-        return view('admin.permissions.create', compact('info','permissions'));
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
+
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
+
+        return view('admin.permissions.create', compact('info','period', 'nama_lokasi','nama_company'));
     }
 
     /**
@@ -65,10 +114,20 @@ class PermissionsController extends Controller
      */
     public function show(Permission $permission)
     {
+        $konek = self::konek();
         $info['list_url'] = route('permissions.index');
         $info['title'] = 'Show Data : [' .$permission->name.']';
 
-        return view('admin.permissions.show', compact('info'))
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
+
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
+        
+        return view('admin.permissions.show', compact('info','period', 'nama_lokasi'))
             ->withPermission($permission);
     }
 
@@ -80,10 +139,17 @@ class PermissionsController extends Controller
      */
     public function edit(Permission $permission)
     {
+        $konek = self::konek();
         $info['list_url'] = route('permissions.index');
         $info['title'] = 'Update Data: [' .$permission->name.']';
 
-        return view('admin.permissions.edit', compact('info'))
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
+
+        return view('admin.permissions.edit', compact('info','period', 'nama_lokasi','nama_company'))
             ->withPermission($permission);
     }
 

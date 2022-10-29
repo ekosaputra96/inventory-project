@@ -16,18 +16,21 @@ class PenerimaanDetail extends Model
 
     protected $table = 'penerimaan_detail';
 
-	// protected $primaryKey = 'no_permintaan';
+    public $incrementing = false;
 
-	public $incrementing = false;
-
-	protected $fillable = [
-    	'no_penerimaan',
+    protected $fillable = [
+        'no_penerimaan',
         'kode_produk',
+        'kode_satuan',
+        'partnumber',
+        'no_mesin',
         'qty',
+        'qty_retur',
         'harga',
+        'landedcost',
     ];
 
-    protected $appends = ['destroy_url','edit_url'];
+    protected $appends = ['destroy_url','edit_url','detail_url'];
 
     public function Produk()
     {
@@ -59,41 +62,26 @@ class PenerimaanDetail extends Model
         return route('penerimaandetail.update',$this->id);
     }
 
+    public function getDetailUrlAttribute()
+    {
+        return route('penerimaandetail.detail',$this->id);
+    }
+
+
     public static function boot()
     {
         parent::boot();
-
+        
         static::creating(function ($query){
-            // $query->status = 'OPEN';
-            // $query->kode_company = Auth()->user()->kode_company;
-            // $query->no_penerimaan = static::generateKode(request());
+            $query->qty_retur = 0;
+            $query->kode_company = Auth()->user()->kode_company;
+            $query->created_by = Auth()->user()->name;
+            $query->updated_by = Auth()->user()->name;
+        });
 
-            $produk = Produk::find($query->kode_produk);
-            $qty_tersedia = $produk->stok;
-            $qty_penerimaan = $query->qty;
-
-            $instock = $qty_tersedia + $qty_penerimaan;
-
-            $itembulanan = new Itembulanan;
-            $itembulanan->kode_company = $produk->kode_company;
-            $itembulanan->periode = \Carbon\Carbon::now();
-            $itembulanan->kode_produk = $produk->kode_produk;
-            $itembulanan->satuan = $produk->kode_satuan;
-            $itembulanan->begin_stock = $produk->stok;
-            $itembulanan->begin_amount = $produk->harga_beli;
-            $itembulanan->increment('in_stock',$qty_penerimaan);
-            $itembulanan->increment('in_amount',$qty_penerimaan);
-            // $itembulanan->in_amount = 0;
-            $itembulanan->out_stock = 0;
-            $itembulanan->out_amount = 0;
-            $itembulanan->adjustment_stock = 0;
-            $itembulanan->adjustment_amount = 0;
-            $itembulanan->stock_opname = 0;
-            $itembulanan->amount_opname = 0;
-            $itembulanan->increment('ending_stock',$qty_penerimaan);
-            $itembulanan->ending_amount = 0;
-            $itembulanan->save();
-            
+        static::updating(function ($query){
+           $query->updated_by = Auth()->user()->name;
         });
     }
+
 }

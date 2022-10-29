@@ -3,6 +3,8 @@
 @section('adminlte_css')
     <link rel="stylesheet"
           href="{{ asset('vendor/adminlte/dist/css/skins/skin-' . config('adminlte.skin', 'blue') . '.min.css')}} ">
+    <link rel="icon" type="image/png" href="/gui_inventory_laravel/css/logo_gui.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/gui_inventory_laravel/css/logo_gui.png" sizes="32x32">
     @stack('css')
     @yield('css')
 @stop
@@ -14,10 +16,11 @@
 ][config('adminlte.layout')] : '') . (config('adminlte.collapse_sidebar') ? ' sidebar-collapse ' : ''))
 
 @section('body')
+<?php use App\Models\Company; ?>
     <div class="wrapper">
 
         <!-- Main Header -->
-        <header class="main-header">
+        <header class="main-header"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
             @if(config('adminlte.layout') == 'top-nav')
             <nav class="navbar navbar-static-top">
                 <div class="container">
@@ -46,9 +49,8 @@
                 <!-- mini logo for sidebar mini 50x50 pixels -->
                 <span class="logo-mini">{!! config('adminlte.logo_mini', '<b>A</b>LT') !!}</span>
                 <!-- logo for regular state and mobile devices -->
-                <span class="logo-lg">{!! config('adminlte.logo', '<b>Admin</b>LTE') !!}</span>
-
-
+            <?php $company = Company::find(auth()->user()->kode_company); ?>
+                <span class="logo-lg" style="font-size:10px"><?php echo $company->nama_company; ?></span>
             </a>
 
             <!-- Header Navbar -->
@@ -57,52 +59,41 @@
                 <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
                     <span class="sr-only">{{ trans('adminlte::adminlte.toggle_navigation') }}</span>
                 </a>
-                {{--<ul class="nav navbar-nav">--}}
-                    {{--<li class="dropdown">--}}
-                        {{--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Manages <span class="caret"></span></a>--}}
-                        {{--<ul class="dropdown-menu">--}}
-                            {{--<li><a href="{{ route('users.index') }}"> <i class="fa fa-user"></i>User</a></li>--}}
-                            {{--<li role="separator" class="divider"></li>--}}
-                            {{--<li><a href="{{ route('roles.index') }}"><i class="fa fa-users"></i>Roles</a></li>--}}
-                            {{--<li><a href="{{ route('permissions.index') }}"><i class="fa fa-life-ring"></i>Permissions</a></li>--}}
-                        {{--</ul>--}}
-                    {{--</li>--}}
-                {{--</ul>--}}
+
+                        <span class="pull-left">
+                            <div class="col">
+                    
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: coral"><font color="white"><div id="txt"></div></font></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: coral"><font color="white"><div id="txt2"></div></font></a>
+
+                            </div>
+                        </span>
             @endif
+
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
-
                     <ul class="nav navbar-nav">
                         <ul class="nav navbar-nav">
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ auth()->user()->email }} <span class="caret"></span></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Profile</a></li>
-                                    <li><a href="#">Change Password</a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="#">Logout</a></li>
-                                </ul>
+                                <div class="col" style="text-align: right">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: white">{{ auth()->user()->name }}&nbsp&nbsp&nbsp&nbsp&nbsp</a><br>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: white"><b>{{ $nama_lokasi }} <span class="caret"></span>&nbsp&nbsp&nbsp&nbsp&nbsp</b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#"
+                                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                                            >Log-out</a>
+                                        </li>
+
+                                        <form id="logout-form" action="{{ url(config('adminlte.logout_url', 'auth/logout')) }}" method="POST" style="display: none;">
+                                            @if(config('adminlte.logout_method'))
+                                                {{ method_field(config('adminlte.logout_method')) }}
+                                            @endif
+                                            {{ csrf_field() }}
+                                        </form>
+                                    </ul>
+                                </div>
                             </li>
                         </ul>
-                        <li>
-                            @if(config('adminlte.logout_method') == 'GET' || !config('adminlte.logout_method') && version_compare(\Illuminate\Foundation\Application::VERSION, '5.3.0', '<'))
-                                <a href="{{ url(config('adminlte.logout_url', 'auth/logout')) }}">
-                                    <i class="fa fa-fw fa-power-off"></i> {{ trans('adminlte::adminlte.log_out') }}
-                                </a>
-                            @else
-                                <a href="#"
-                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                                >
-                                    <i class="fa fa-fw fa-power-off"></i> {{ trans('adminlte::adminlte.log_out') }}
-                                </a>
-                                <form id="logout-form" action="{{ url(config('adminlte.logout_url', 'auth/logout')) }}" method="POST" style="display: none;">
-                                    @if(config('adminlte.logout_method'))
-                                        {{ method_field(config('adminlte.logout_method')) }}
-                                    @endif
-                                    {{ csrf_field() }}
-                                </form>
-                            @endif
-                        </li>
                     </ul>
                 </div>
                 @if(config('adminlte.layout') == 'top-nav')
@@ -116,7 +107,7 @@
         <aside class="main-sidebar">
 
             <!-- sidebar: style can be found in sidebar.less -->
-            <section class="sidebar">
+            <section class="sidebar" style="font-size: 13px;">
 
                 <!-- Sidebar Menu -->
                 <ul class="sidebar-menu" data-widget="tree">
@@ -134,14 +125,9 @@
             <div class="container">
             @endif
 
-            <!-- Content Header (Page header) -->
-            <section class="content-header">
-{{--                {{ dd($adminlte->menu()) }}--}}
-                @yield('content_header')
-            </section>
-
             <!-- Main content -->
             <section class="content">
+                
                 @yield('content')
             </section>
             <!-- /.content -->
@@ -154,12 +140,74 @@
 
     </div>
     <!-- ./wrapper -->
+    
+    <div class="se-pre-con"></div>
 @stop
+
+<style>
+    .no-js #loader { display: none;  }
+            .js #loader { display: block; position: absolute; left: 100px; top: 0; }
+            .se-pre-con {
+                position: fixed;
+                left: 0px;
+                top: 0px;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+                background: url(https://wallpapercave.com/uwp/uwp1578707.gif) center no-repeat #fff;
+            }
+</style>
 
 @section('adminlte_js')
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
     <script src="{{ asset('vendor/adminlte/vendor/vuejs/vue.js') }}"></script>
-    <script src="{{ asset('vendor/adminlte/vendor/axios/axios.min.js') }}"></script>
+    <!--<script src="{{ asset('vendor/adminlte/vendor/axios/axios.min.js') }}"></script>-->
     @stack('js')
     @yield('js')
 @stop
+
+<script>
+                                function formatDate(date) {
+                                          var monthNames = [
+                                            "January", "February", "March",
+                                            "April", "May", "June", "July",
+                                            "August", "September", "October",
+                                            "November", "December"
+                                          ];
+
+                                          var day = date.getDate();
+                                          var monthIndex = date.getMonth();
+                                          var year = date.getFullYear();
+
+                                          return day + ' ' + monthNames[monthIndex] + ' ' + year;
+                                        }
+
+                                function startTime() {
+                                      
+                                      var today = new Date();
+                                      var today2 = formatDate(new Date())
+                                      var h = today.getHours();
+                                      var m = today.getMinutes();
+                                      var s = today.getSeconds();
+                                      var open_month = "<?php echo $period ?>";
+                                      m = checkTime(m);
+                                      s = checkTime(s);                                    
+                                      
+                                      document.getElementById('txt').innerHTML =
+                                       "<b>"+ today2 + "</b> | <b>" + h + ":" + m + ":" + s + "</b>";
+                                      document.getElementById('txt2').innerHTML = "Periode Aktif : " + "<b>" + open_month + "</b>";
+                                      var t = setTimeout(startTime, 500);
+                                      
+                                      $(document).ready(function() {
+                                        $(".se-pre-con").fadeOut("slow");
+                                      });
+                                      
+                                    }
+
+                                    function checkTime(i) {
+                                      if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+                                      return i;
+                                    }                   
+                                      
+</script>
+

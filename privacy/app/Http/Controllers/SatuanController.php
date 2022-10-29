@@ -5,105 +5,90 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\Models\satuan;
+use App\Models\Produk;
+use App\Models\Jasa;
+use App\Models\tb_akhir_bulan;
+use App\Models\MasterLokasi;
+use App\Models\Company;
+use Carbon;
 
 
 class SatuanController extends Controller
 {
-    //
-
+    public function konek()
+    {
+        $compa2 = auth()->user()->kode_company;
+        $compa = substr($compa2,0,2);
+        if ($compa == '01'){
+            $koneksi = 'mysqldepo';
+        }else if ($compa == '02'){
+            $koneksi = 'mysqlpbm';
+        }else if ($compa == '99'){
+            $koneksi = 'mysqlpbmlama';
+        }else if ($compa == '03'){
+            $koneksi = 'mysqlemkl';
+        }else if ($compa == '22'){
+            $koneksi = 'mysqlskt';
+        }else if ($compa == '04'){
+            $koneksi = 'mysqlgut';
+        }else if ($compa == '05'){
+            $koneksi = 'mysql';
+        }else if ($compa == '06'){
+            $koneksi = 'mysqlinfra';
+        }
+        return $koneksi;
+    }
+    
     public function index()
     {
-        
+        $konek = self::konek();
         $create_url = route('satuan.create');
 
-        return view('admin.satuan.index',compact('create_url'));
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
 
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
+
+        return view('admin.satuan.index',compact('create_url','period', 'nama_lokasi','nama_company'));
+        
     }
 
     public function anyData()
     {
-        return Datatables::of(satuan::query())
-           ->addColumn('action', function ($query){
-                return '<a href="javascript:;" onclick="edit(\''.$query->id.'\',\''.$query->edit_url.'\')" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>'.'&nbsp'.
-                    '<a href="javascript:;" onclick="del(\''.$query->id.'\',\''.$query->destroy_url.'\')" id="hapus" class="btn btn-danger btn-sm"> <i class="fa fa-times-circle"></i> Hapus</a>'.'&nbsp';
-                           })
-            ->make(true);
-
+        return Datatables::of(satuan::query())->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-         $list_url= route('satuan.index');
-         $info['title'] = 'Create Satuan';
-
-        return view('admin.satuan.create', compact('list_url','info'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $validator = $request->validate([
-            'kode_satuan'=>'required',
-            'nama_satuan'=> 'required',
-            'status' => 'required'
-          ]);
-          
-        try {
-            satuan::create($request->all());
+        $kode_satuan = $request->kode_satuan;
+        $nama_satuan = $request->nama_satuan;
+        $cek_satuan = Satuan::where('kode_satuan',$kode_satuan)->orwhere('nama_satuan',$nama_satuan)->first();
+        if ($cek_satuan==null){
+            $satuan = satuan::create($request->all());
             $message = [
-            'success' => true,
-            'title' => 'Simpan',
-            'message' => 'Selamat! Data berhasil di Disimpan.'
+                'success' => true,
+                'title' => 'Simpan',
+                'message' => 'Data telah disimpan.'
             ];
             return response()->json($message);
-        }catch (\Exception $exception){
-
-            return response()->json(['errors' => $validator->errors()]);
+        } else {
+            $message = [
+                'success' => false,
+                'title' => 'Simpan',
+                'message' => 'Kode Satuan Sudah Ada',
+            ];
+            return response()->json($message);  
         }
-        //  satuan::create($request->all());
-        //  return redirect()->route('satuan.index');
-
+        
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Customer $Customer)
+    public function edit_satuan()
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    // public function edit(satuan $satuan)
-    // {
-    //     //
-    //     $list_url= route('satuan.index');
-    //     $info['title'] = 'Edit Satuan';
-       
-    //     return view('admin.satuan.edit', compact('satuan','list_url','info'));
-    // }
-
-    public function edit(satuan $satuan)
-    {
-        $kode_satuan = $satuan->kode_satuan;
+        $kode_satuan = request()->id;
         $data = satuan::find($kode_satuan);
         $output = array(
             'kode_satuan'=>$data->kode_satuan,
@@ -111,82 +96,60 @@ class SatuanController extends Controller
             'status'=>$data->status,
         );
         return response()->json($output);
-        //
-        // $list_url= route('permintaandetail.index');
-        // $info['title'] = 'Edit PermintaanDetail';
-        
-        // // dd($PermintaanDetail);
-        // return view('admin.permintaandetail.edit', compact('permintaandetail','list_url','info'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    // public function update(Request $request, satuan $satuan)
-    // {
-    //     //
-    //   $request->validate([
-    //     'kode_satuan'=>'required',
-    //     'nama_satuan'=> 'required',
-    //     'status' => 'required'
-    //   ]);
-    
-    //  $satuan->update($request->all());	
-
-    //   return redirect()->route('satuan.index');
-    // }
 
     public function updateAjax(Request $request)
     {
-        //
-      $request->validate([
-        'kode_satuan'=>'required',
-        'nama_satuan'=> 'required',
-        'status' => 'required'
-      ]);
+        $satuan2 = $request->kode_satuan;
+        $cek_satuan = Produk::where('kode_satuan',$satuan2)->first();
+        if ($cek_satuan == null){
+            $request->validate([
+                'kode_satuan'=>'required',
+                'nama_satuan'=> 'required',
+                'status' => 'required'
+            ]);
 
-      satuan::find($request->kode_satuan)->update($request->all());
-   
-      $message = [
-        'success' => true,
-        'title' => 'Update',
-        'message' => 'Selamat! Data berhasil di Update.'
-        ];
-        return response()->json($message);
-    //  return redirect()->back();
-        // return redirect()->route('satuan.index');
+            satuan::find($request->kode_satuan)->update($request->all());
+
+            $message = [
+                'success' => true,
+                'title' => 'Update',
+                'message' => 'Data telah di Update.'
+            ];
+            return response()->json($message);
+        }else{
+            $message = [
+                'success' => false,
+                'title' => 'Update',
+                'message' => 'Data ['.$request->kode_satuan.'] sudah terikat ke item.'
+            ];
+            return response()->json($message);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(satuan $satuan)
-    {
-           try {
+    public function hapus_satuan()
+    {   
+        $satuan2 = request()->id;
+        $satuan = satuan::find(request()->id);
+        $cek_satuan = Produk::where('kode_satuan',$satuan2)->first();
+
+        if ($cek_satuan == null){
             $satuan->delete();
 
             $message = [
                 'success' => true,
                 'title' => 'Update',
-                'message' => 'Selamat! Data ['.$satuan->nama_satuan.'] berhasil dihapus.'
+                'message' => 'Data ['.$satuan->nama_satuan.'] telah dihapus.'
             ];
             return response()->json($message);
-
-        }catch (\Exception $exception){
+        } else {
             $message = [
                 'success' => false,
                 'title' => 'Update',
-                'message' => 'Maaf! Data gagal dihapus.'
+                'message' => 'Data ['.$satuan->nama_satuan.'] dipakai dalam transaksi.'
             ];
             return response()->json($message);
         }
-    
+        
     }
 }

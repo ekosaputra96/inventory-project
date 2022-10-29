@@ -17,8 +17,19 @@ class RolesDataTable extends DataTable
     {
         return datatables($query)
             ->addColumn('action', function ($query){
-                return '<a href="'.$query->edit_url.'" class="btn btn-warning btn-sm"> <i class="fa fa-edit"></i> Edit</a>'.'&nbsp'.
-                    '<a href="javascript:;" onclick="del(\''.$query->id.'\',\''.$query->destroy_url.'\')" id="hapus" class="btn btn-danger btn-sm"> <i class="fa fa-times-circle"></i> Hapus</a>'.'&nbsp';
+                $action = '<a href="'.$query->edit_url.'" class="btn btn-warning btn-xs" data-toggle="tooltip" title="Edit"> <i class="fa fa-edit"></i></a>'.'&nbsp'.
+                    '<a href="javascript:;" data-toggle="tooltip" title="Hapus" onclick="del(\''.$query->id.'\',\''.$query->destroy_url.'\')" 
+                    id="hapus" class="btn btn-danger btn-xs"> <i class="fa fa-times-circle"></i></a>'.'&nbsp';
+
+                $action2 = '<a href="'.$query->edit_url.'" class="btn btn-warning btn-xs" data-toggle="tooltip" title="Edit"> <i class="fa fa-edit"></i></a>'.'&nbsp';
+
+                $level = auth()->user()->level;
+                if($level != 'superadministrator'){
+                    return $action2;
+                }
+                else{
+                    return $action;
+                }
             });
     }
 
@@ -57,7 +68,6 @@ class RolesDataTable extends DataTable
         return [
             'name',
             'display_name',
-            'description',
         ];
     }
 

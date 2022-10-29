@@ -5,110 +5,118 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\Models\Company;
+use App\Models\tb_akhir_bulan;
+use App\Models\MasterLokasi;
+use Carbon;
+use DB;
 
 class CompanyController extends Controller
 {
-    //
+    public function konek()
+    {
+        $compa2 = auth()->user()->kode_company;
+        $compa = substr($compa2,0,2);
+        if ($compa == '01'){
+            $koneksi = 'mysqldepo';
+        }else if ($compa == '02'){
+            $koneksi = 'mysqlpbm';
+        }else if ($compa == '99'){
+            $koneksi = 'mysqlpbmlama';
+        }else if ($compa == '03'){
+            $koneksi = 'mysqlemkl';
+        }else if ($compa == '22'){
+            $koneksi = 'mysqlskt';
+        }else if ($compa == '04'){
+            $koneksi = 'mysqlgut';
+        }else if ($compa == '05'){
+            $koneksi = 'mysql';
+        }else if ($compa == '06'){
+            $koneksi = 'mysqlinfra';
+        }
+        return $koneksi;
+    }
+    
     public function index()
     {
-        
+        $konek = self::konek();
         $create_url = route('company.create');
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
+        
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
+        
+        $company = Company::select('kode_company', DB::raw("concat(kode_company,' - ',nama_company) as compan"))->whereRaw('LENGTH(kode_company) = 2')->pluck('compan','kode_company');
 
-        return view('admin.company.index',compact('create_url'));
+        return view('admin.company.index',compact('create_url','period', 'nama_lokasi','company','nama_company'));
 
     }
 
     public function anyData()
     {
-        return Datatables::of(Company::query())
-            ->editColumn('alamat', function ($query)
-            {
-                return str_limit($query->alamat,20,'...');
-            })
-           ->addColumn('action', function ($query){
-                return '<a href="javascript:;" onclick="edit(\''.$query->id.'\',\''.$query->edit_url.'\')" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>'.'&nbsp'.
-                    '<a href="javascript:;" onclick="del(\''.$query->id.'\',\''.$query->destroy_url.'\')" id="hapus" class="btn btn-danger btn-sm"> <i class="fa fa-times-circle"></i> Hapus</a>'.'&nbsp';
-                           })
-            ->make(true);
-
+        return Datatables::of(Company::orderBy('kode_company'))->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-         $list_url= route('company.index');
-         $info['title'] = 'Create Company';
-
-        return view('admin.company.create', compact('list_url','info'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
-    {
-        $validator = $request->validate([
-            'kode_company'=>'required',
-            'nama_company'=> 'required',
-            'alamat'=> 'required',
-            'telp'=> 'required',
-            'npwp'=> 'required',
-            'status'=> 'required',
-          ]);
+    {   
+        $kode_company = $request->kode_company;
+        $nama_company = $request->nama_company;
 
-        try {
-            Company::create($request->all());
+        $cek_nama = Company::where('nama_company',$nama_company)->first();       
+        if ($cek_nama==null){
+
+            if ($request->tipe == "Cabang"){
+
+                $comp = $request->kode_comp;
+                $cek_comp = Company::where('kode_company', 'like', $comp.'%')->orderBy('kode_company','desc')->first();
+                $data = Company::create($request->all());
+                if (strlen($cek_comp->kode_company) == 4){
+                    $kode = substr($cek_comp->kode_company,3);
+                    $kode += 1;
+                    $no = $request->all();
+                    if (strlen($kode) == 2){
+                        $kode2 = substr($cek_comp->kode_company,0,2);
+                        $no['kode_company'] = $kode2.$kode;
+                        $data->update($no);
+                    }else {
+                        $kode2 = substr($cek_comp->kode_company,0,3);
+                        $no['kode_company'] = $kode2.$kode;
+                        $data->update($no);
+                    }
+                }else {
+                    $kode = $comp."01";
+                    $no = $request->all();
+                    $no['kode_company'] = $kode;
+                    $data->update($no);
+                }
+            }else {
+                Company::create($request->all());
+            }
+
             $message = [
-            'success' => true,
-            'title' => 'Simpan',
-            'message' => 'Selamat! Data berhasil di Disimpan.'
+                'success' => true,
+                'title' => 'Simpan',
+                'message' => 'Data telah Disimpan.'
             ];
             return response()->json($message);
-        }catch (\Exception $exception){
-            
-            return response()->json(['errors' => $validator->errors()]);
         }
-        // Company::create($request->all());
-        // return redirect()->route('company.index');
-
+        else{
+            $message = [
+                'success' => false,
+                'title' => 'Simpan',
+                'message' => 'Gagal! Nama Company Sudah Ada.'
+            ];
+            return response()->json($message);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Company $Company)
+    public function edit_company()
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    // public function edit(Company $company)
-    // {
-    //     //
-    //     $list_url= route('company.index');
-    //     $info['title'] = 'Edit Company';
-    //     // dd($Company);
-    //     return view('admin.company.edit', compact('company','list_url','info'));
-    // }
-
-    public function edit(Company $company)
-    {
-        $kode_company = $company->kode_company;
+        $kode_company = request()->id;
         $data = Company::find($kode_company);
         $output = array(
             'kode_company'=>$data->kode_company,
@@ -119,88 +127,33 @@ class CompanyController extends Controller
             'status'=>$data->status,
         );
         return response()->json($output);
-        //
-        // $list_url= route('permintaandetail.index');
-        // $info['title'] = 'Edit PermintaanDetail';
-        
-        // // dd($PermintaanDetail);
-        // return view('admin.permintaandetail.edit', compact('permintaandetail','list_url','info'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    // public function update(Request $request, Company $company)
-    // {
-    //     //
-    //   $request->validate([
-    //     'kode_company'=>'required',
-    //     'nama_company'=> 'required',
-    //     'alamat'=> 'required',
-    //     'telp'=> 'required',
-    //     'npwp'=> 'required',
-    //     'status'=> 'required',
-    //   ]);
-    
-    //  $company->update($request->all());	
-
-    //   return redirect()->route('company.index');
-    // }
 
     public function updateAjax(Request $request)
     {
-        //
-      $request->validate([
-        'kode_company'=>'required',
-        'nama_company'=> 'required',
-        'alamat'=> 'required',
-        'telp'=> 'required',
-        'npwp'=> 'required',
-        'status'=> 'required',
-      ]);
+        $nama_company = $request->nama_company;
 
-      Company::find($request->kode_company)->update($request->all());
-   
-      $message = [
-        'success' => true,
-        'title' => 'Update',
-        'message' => 'Selamat! Data berhasil di Update.'
+        Company::find($request->kode_company)->update($request->all());
+
+        $message = [
+            'success' => true,
+            'title' => 'Update',
+            'message' => 'Data telah di Update.'
         ];
         return response()->json($message);
-    //  return redirect()->back();
-        // return redirect()->route('satuan.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Company $company)
-    {
-           try {
-            $company->delete();
+    public function hapus_company()
+    {   
+        $company = Company::find(request()->id);
 
-            $message = [
-                'success' => true,
-                'title' => 'Update',
-                'message' => 'Selamat! Data ['.$company->nama_company.'] berhasil dihapus.'
-            ];
-            return response()->json($message);
+        $company->delete();
 
-        }catch (\Exception $exception){
-            $message = [
-                'success' => false,
-                'title' => 'Update',
-                'message' => 'Maaf! Data gagal dihapus.'
-            ];
-            return response()->json($message);
-        }
-    
+        $message = [
+            'success' => true,
+            'title' => 'Update',
+            'message' => 'Data ['.$company->nama_company.'] telah dihapus.'
+        ];
+        return response()->json($message);
     }
 }

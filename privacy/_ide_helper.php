@@ -3,7 +3,7 @@
 
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.6.39 on 2019-01-21 11:28:30.
+ * Generated for Laravel 5.6.39 on 2019-09-13 11:23:04.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -8445,10 +8445,10 @@ namespace Illuminate\Support\Facades {
          * 
          * Suppose this request is instantiated from /mysite on localhost:
          * 
-         *  * http://localhost/mysite              returns an empty string
-         *  * http://localhost/mysite/about        returns '/about'
-         *  * http://localhost/mysite/enco%20ded   returns '/enco%20ded'
-         *  * http://localhost/mysite/about?var=1  returns '/about'
+         *  * https://aplikasi.gui-group.co.id/mysite              returns an empty string
+         *  * https://aplikasi.gui-group.co.id/mysite/about        returns '/about'
+         *  * https://aplikasi.gui-group.co.id/mysite/enco%20ded   returns '/enco%20ded'
+         *  * https://aplikasi.gui-group.co.id/mysite/about?var=1  returns '/about'
          *
          * @return string The raw path (i.e. not urldecoded)
          * @static 
@@ -8464,10 +8464,10 @@ namespace Illuminate\Support\Facades {
          * 
          * Suppose that an index.php file instantiates this request object:
          * 
-         *  * http://localhost/index.php         returns an empty string
-         *  * http://localhost/index.php/page    returns an empty string
-         *  * http://localhost/web/index.php     returns '/web'
-         *  * http://localhost/we%20b/index.php  returns '/we%20b'
+         *  * https://aplikasi.gui-group.co.id/index.php         returns an empty string
+         *  * https://aplikasi.gui-group.co.id/index.php/page    returns an empty string
+         *  * https://aplikasi.gui-group.co.id/web/index.php     returns '/web'
+         *  * https://aplikasi.gui-group.co.id/we%20b/index.php  returns '/we%20b'
          *
          * @return string The raw path (i.e. not urldecoded)
          * @static 
@@ -14334,6 +14334,219 @@ namespace Barryvdh\Debugbar {
  
 }
 
+namespace UxWeb\SweetAlert { 
+
+    /**
+     * 
+     *
+     */ 
+    class SweetAlert {
+        
+        /**
+         * Display an alert message with a text and an optional title.
+         * 
+         * By default the alert is not typed.
+         *
+         * @param string $text
+         * @param string $title
+         * @param string $icon
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function message($text = '', $title = null, $icon = null)
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::message($text, $title, $icon);
+        }
+        
+        /**
+         * Display a not typed alert message with a text and a title.
+         *
+         * @param string $text
+         * @param string $title
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function basic($text, $title)
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::basic($text, $title);
+        }
+        
+        /**
+         * Display an info typed alert message with a text and an optional title.
+         *
+         * @param string $text
+         * @param string $title
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function info($text, $title = '')
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::info($text, $title);
+        }
+        
+        /**
+         * Display a success typed alert message with a text and an optional title.
+         *
+         * @param string $text
+         * @param string $title
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function success($text, $title = '')
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::success($text, $title);
+        }
+        
+        /**
+         * Display an error typed alert message with a text and an optional title.
+         *
+         * @param string $text
+         * @param string $title
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function error($text, $title = '')
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::error($text, $title);
+        }
+        
+        /**
+         * Display a warning typed alert message with a text and an optional title.
+         *
+         * @param string $text
+         * @param string $title
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function warning($text, $title = '')
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::warning($text, $title);
+        }
+        
+        /**
+         * Set the duration for this alert until it autocloses.
+         *
+         * @param int $milliseconds
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function autoclose($milliseconds = null)
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::autoclose($milliseconds);
+        }
+        
+        /**
+         * Add a confirmation button to the alert.
+         *
+         * @param string $buttonText
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function confirmButton($buttonText = 'OK', $overrides = array())
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::confirmButton($buttonText, $overrides);
+        }
+        
+        /**
+         * Add a cancel button to the alert.
+         *
+         * @param string $buttonText
+         * @param array $overrides
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function cancelButton($buttonText = 'Cancel', $overrides = array())
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::cancelButton($buttonText, $overrides);
+        }
+        
+        /**
+         * Add a new custom button to the alert.
+         *
+         * @param string $key
+         * @param string $buttonText
+         * @param array $overrides
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function addButton($key, $buttonText, $overrides = array())
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::addButton($key, $buttonText, $overrides);
+        }
+        
+        /**
+         * Toggle close the alert message when clicking outside.
+         *
+         * @param string $buttonText
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function closeOnClickOutside($value = true)
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::closeOnClickOutside($value);
+        }
+        
+        /**
+         * Make this alert persistent with a confirmation button.
+         *
+         * @param string $buttonText
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function persistent($buttonText = 'OK')
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::persistent($buttonText);
+        }
+        
+        /**
+         * Make Message HTML view.
+         *
+         * @param bool|true $html
+         * @return \UxWeb\SweetAlert\SweetAlertNotifier $this
+         * @static 
+         */ 
+        public static function html()
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::html();
+        }
+        
+        /**
+         * Return the current alert configuration.
+         *
+         * @return array 
+         * @static 
+         */ 
+        public static function getConfig($key = null)
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::getConfig($key);
+        }
+        
+        /**
+         * Customize alert configuration "by hand".
+         *
+         * @return array 
+         * @static 
+         */ 
+        public static function setConfig($config = array())
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::setConfig($config);
+        }
+        
+        /**
+         * Return the current alert configuration as Json.
+         *
+         * @return string 
+         * @static 
+         */ 
+        public static function getJsonConfig()
+        {
+            return \UxWeb\SweetAlert\SweetAlertNotifier::getJsonConfig();
+        }
+         
+    }
+ 
+}
+
 namespace Collective\Html { 
 
     /**
@@ -15430,6 +15643,88 @@ namespace Collective\Html {
         public static function componentCall($method, $parameters)
         {
             return \Collective\Html\HtmlBuilder::componentCall($method, $parameters);
+        }
+         
+    }
+ 
+}
+
+namespace Riskihajar\Terbilang\Facades { 
+
+    /**
+     * 
+     *
+     */ 
+    class Terbilang {
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function make($number, $suffix = false, $prefix = false)
+        {
+            return \Riskihajar\Terbilang\Terbilang::make($number, $suffix, $prefix);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function short($number, $format = null)
+        {
+            return \Riskihajar\Terbilang\Terbilang::short($number, $format);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function date($date, $format = 'Y-m-d')
+        {
+            return \Riskihajar\Terbilang\Terbilang::date($date, $format);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function time($time, $format = 'h:i:s')
+        {
+            return \Riskihajar\Terbilang\Terbilang::time($time, $format);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function period($start, $end = null, $format = null)
+        {
+            return \Riskihajar\Terbilang\Terbilang::period($start, $end, $format);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function datetime($datetime, $format = 'Y-m-d h:i:s')
+        {
+            return \Riskihajar\Terbilang\Terbilang::datetime($datetime, $format);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function roman($number, $lowercase = false)
+        {
+            return \Riskihajar\Terbilang\Terbilang::roman($number, $lowercase);
         }
          
     }
@@ -18069,9 +18364,13 @@ namespace  {
 
     class Debugbar extends \Barryvdh\Debugbar\Facade {}
 
+    class Alert extends \UxWeb\SweetAlert\SweetAlert {}
+
     class Form extends \Collective\Html\FormFacade {}
 
     class Html extends \Collective\Html\HtmlFacade {}
+
+    class Terbilang extends \Riskihajar\Terbilang\Facades\Terbilang {}
 
     class Laratrust extends \Laratrust\LaratrustFacade {}
 

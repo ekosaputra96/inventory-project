@@ -60,7 +60,7 @@
 <script src="{{ asset('vendor/adminlte/vendor/notify/notify.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/vendor/vuejs/vue.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/vendor/axios/axios.js') }}"></script>
-<script src="{{ asset('js/bootstrap.datepicker.js') }}"></script>
+<!--<script src="{{ asset('js/bootstrap.datepicker.js') }}"></script>-->
 <script src="{{ asset('js/bootstrap-switch.js')}}"></script>
 <script src="{{asset('js/jquery-ui.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>

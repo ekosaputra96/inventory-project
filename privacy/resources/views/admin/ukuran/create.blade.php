@@ -1,48 +1,107 @@
 @extends('adminlte::page')
 
-@section('title', 'Ukuran Create')
+@section('title', 'Ukuran')
 
 @section('content_header')
-    <h1>Ukuran</h1>
+
 @stop
 
 @section('content')
-    <div class="box">
-        <div class="box-header with-border">
-            <h3 class="box-title">Create Ukuran</h3>
-            <!-- /.box-tools -->
-        </div>
-        <!-- /.box-header -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.2.0/sweetalert2.all.min.js"></script>
+@include('sweet::alert')
+<body onLoad="load()">
+    <div class="box box-solid">
         <div class="box-body">
-            <a href="{{ $list_url }}" class="btn btn-default btn-sm">Lihat Data</a>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover" id="ukuran-table" width="100%" style="font-size: 12px;">
+                    <thead>
+                    <tr class="bg-blue">
+                        <th>Kode Ukuran</th>
+                        <th>Nama Ukuran</th>
+                     </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
-    <div class="box box-success">
-        <div class="box-body">
-            @include('errors.validation')
-            {!! Form::open(['route' => ['ukuran.store'],'method' => 'post','id'=>'form']) !!}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                {{ Form::label('kode ukuran', 'Kode Ukuran:') }}
-                                {{ Form::text('kode_ukuran', null, ['class'=> 'form-control']) }}
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                {{ Form::label('nama ukuran', 'Nama Ukuran:') }}
-                                {{ Form::text('nama_ukuran', null, ['class'=> 'form-control',]) }}
-                            </div>
-                        </div>
-        </div>
-        <div class=" box-footer">
-                    <div class="pull-right">
-                    {{ Form::submit('Create data', ['class' => 'btn btn-success']) }}
-                    </div>
-        </div>
 
-        {!! Form::close() !!}
-        </div>
+    <button type="button" class="back2Top btn btn-warning btn-xs" id="back2Top"><i class="fa fa-arrow-up" style="color: #fff"></i> <i>{{ $nama_company }}</i> <b>({{ $nama_lokasi }})</b></button>
 
-    </div>
-    <!-- /.box -->
+        <style type="text/css">
+            #back2Top {
+                width: 400px;
+                line-height: 27px;
+                overflow: hidden;
+                z-index: 999;
+                display: none;
+                cursor: pointer;
+                position: fixed;
+                bottom: 0;
+                text-align: left;
+                font-size: 15px;
+                color: #000000;
+                text-decoration: none;
+            }
+            #back2Top:hover {
+                color: #fff;
+            }
+        </style>
+</body>
 @stop
+
+@push('css')
+
+@endpush
+@push('js')
+  
+    <script type="text/javascript">
+        $(window).scroll(function() {
+            var height = $(window).scrollTop();
+            if (height > 1) {
+                $('#back2Top').show();
+            } else {
+                $('#back2Top').show();
+            }
+        });
+        
+        $(document).ready(function() {
+            $("#back2Top").click(function(event) {
+                event.preventDefault();
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                return false;
+            });
+
+        });
+
+        function load(){
+            startTime();
+            $('.tombol1').hide();
+            $('.tombol2').hide();
+            $('.back2Top').show();
+        }
+        
+        $(function() {
+            $('#ukuran-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{!! route('ukuran.data') !!}',
+            columns: [
+                { data: 'kode_ukuran', name: 'kode_ukuran' },
+                { data: 'nama_ukuran', name: 'nama_ukuran' },
+            ]
+            });
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+
+        function refreshTable() {
+             $('#ukuran-table').DataTable().ajax.reload(null,false);;
+        }
+    </script>
+@endpush

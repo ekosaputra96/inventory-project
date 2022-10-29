@@ -11,13 +11,10 @@ use DB;
 
 class ItembulananController extends Controller
 {
-    //
-
     public function show()
     {
         $itembulanan = Itembulanan::find(request()->id);
-        // dd($itembulanan);
-
+        
         if($itembulanan){
             $output = array(
 

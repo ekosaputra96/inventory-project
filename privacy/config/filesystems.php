@@ -63,6 +63,14 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
         ],
+        'ftp' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_HOST','103.109.168.194'),
+            'port' => env('FTP_PORT', '21'),
+            'username' => env('FTP_USERNAME','root'),
+            'password' => env('FTP_PASSWORD','gui12345'),
+            'root' => '/mnt/nextcloud/iocage/jails/nc/root/usr/local/www/nextcloud/data/__groupfolders/7' // for example: /public_html/images
+        ],
 
     ],
 

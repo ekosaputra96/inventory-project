@@ -5,193 +5,147 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use App\Models\MasterLokasi;
+use App\Models\Mobil;
+use App\Models\Alat;
+use App\Models\tb_akhir_bulan;
+use App\Models\Company;
+use Carbon;
 
 class MasterLokasiController extends Controller
 {
-    //
+    public function konek()
+    {
+        $compa2 = auth()->user()->kode_company;
+        $compa = substr($compa2,0,2);
+        if ($compa == '01'){
+            $koneksi = 'mysqldepo';
+        }else if ($compa == '02'){
+            $koneksi = 'mysqlpbm';
+        }else if ($compa == '99'){
+            $koneksi = 'mysqlpbmlama';
+        }else if ($compa == '03'){
+            $koneksi = 'mysqlemkl';
+        }else if ($compa == '22'){
+            $koneksi = 'mysqlskt';
+        }else if ($compa == '04'){
+            $koneksi = 'mysqlgut';
+        }else if ($compa == '05'){
+            $koneksi = 'mysql';
+        }else if ($compa == '06'){
+            $koneksi = 'mysqlinfra';
+        }
+        return $koneksi;
+    }
+    
     public function index()
     {
-        
+        $konek = self::konek();
         $create_url = route('masterlokasi.create');
 
-        return view('admin.masterlokasi.index',compact('create_url'));
+        $tgl_jalan = tb_akhir_bulan::on($konek)->where('reopen_status','true')->orwhere('status_periode','Open')->first();
+        $tgl_jalan2 = $tgl_jalan->periode;
+        $period = Carbon\Carbon::parse($tgl_jalan2)->format('F Y');
+        $get_lokasi = MasterLokasi::where('kode_lokasi',auth()->user()->kode_lokasi)->first();
+        $nama_lokasi = $get_lokasi->nama_lokasi;
+        
+        $get_company = Company::where('kode_company',auth()->user()->kode_company)->first();
+        $nama_company = $get_company->nama_company;
 
+        return view('admin.masterlokasi.index',compact('create_url','period', 'nama_lokasi','nama_company'));
     }
 
     public function anyData()
     {
-        return Datatables::of(MasterLokasi::query())
-            ->editColumn('alamat', function ($query)
-            {
-                return str_limit($query->alamat,20,'...');
-            })
-           ->addColumn('action', function ($query){
-                return '<a href="javascript:;" onclick="edit(\''.$query->id.'\',\''.$query->edit_url.'\')" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> Edit</a>'.'&nbsp'.
-                    '<a href="javascript:;" onclick="del(\''.$query->id.'\',\''.$query->destroy_url.'\')" id="hapus" class="btn btn-danger btn-sm"> <i class="fa fa-times-circle"></i> Hapus</a>'.'&nbsp';
-                           })
-            ->make(true);
-
+        return Datatables::of(MasterLokasi::query())->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-         $list_url= route('masterlokasi.index');
-         $info['title'] = 'Create Master Lokasi';
-
-        return view('admin.masterlokasi.create', compact('list_url','info'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $validator = $request->validate([
-            'nama_lokasi'=> 'required',
-            'nickname'=> 'required',
-            'alamat'=> 'required',
-            'status'=> 'required',
-        ]);
-
-        try {
+        $nama_lokasi = $request->nama_lokasi;
+        $ceklokasi = MasterLokasi::where('nama_lokasi',$nama_lokasi)->first();
+        if ($ceklokasi == null) {
             MasterLokasi::create($request->all());
             $message = [
-            'success' => true,
-            'title' => 'Simpan',
-            'message' => 'Selamat! Data berhasil di Disimpan.'
+                'success' => true,
+                'title' => 'Simpan',
+                'message' => 'Data telah di Disimpan.'
             ];
             return response()->json($message);
-        }catch (\Exception $exception){
-
-            return response()->json(['errors' => $validator->errors()]);
         }
-        
-        // return response()->json(['errors' => $validator->errors()]);
-
-        // return redirect()->route('masterlokasi.index');
-
+        else{
+            $message = [
+                'success' => false,
+                'title' => 'Simpan',
+                'message' => 'Lokasi sudah ada.',
+            ];
+            return response()->json($message);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    public function show(MasterLokasi $masterlokasi)
+    public function edit_lokasi()
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    // public function edit(masterlokasi $masterlokasi)
-    // {
-    //     //
-    //     $list_url= route('masterlokasi.index');
-    //     $info['title'] = 'Edit masterlokasi';
-    //     // dd($masterlokasi);
-    //     return view('admin.masterlokasi.edit', compact('masterlokasi','list_url','info'));
-    // }
-
-    public function edit(MasterLokasi $masterlokasi)
-    {
-        $id_lokasi = $masterlokasi->id_lokasi;
-        $data = MasterLokasi::find($id_lokasi);
+        $kode_lokasi = request()->id;
+        $data = MasterLokasi::find($kode_lokasi);
         $output = array(
-            'id'=>$data->id_lokasi,
+            'id'=>$data->kode_lokasi,
             'nama_lokasi'=>$data->nama_lokasi,
-            'nickname'=>$data->nickname,
             'alamat'=>$data->alamat,
             'status'=>$data->status,
         );
         return response()->json($output);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    // public function update(Request $request, Masterlokasi $masterlokasi)
-    // {
-    //     //
-    //   $request->validate([
-    //     'id_lokasi'=>'required',
-    //     'nama_lokasi'=> 'required',
-    //     'nickname'=> 'required',
-    //     'alamat'=> 'required',
-    //     'status'=> 'required',
-    //   ]);
-    
-    //   $masterlokasi->update($request->all());	
-
-    //   return redirect()->route('masterlokasi.index');
-    // }
 
     public function updateAjax(Request $request)
     {
-        //
-      $request->validate([
-        'id_lokasi'=>'required',
-        'nama_lokasi'=> 'required',
-        'nickname'=> 'required',
-        'alamat'=> 'required',
-        'status'=> 'required',
-      ]);
+        $kode_lokasi = $request->kode_lokasi;
+        $cek_lokasi = Mobil::where('kode_lokasi',$kode_lokasi)->first();
+        $cek_lokasi2 = Alat::where('kode_lokasi',$kode_lokasi)->first();
 
-      MasterLokasi::find($request->id_lokasi)->update($request->all());
-   
-      $message = [
-        'success' => true,
-        'title' => 'Update',
-        'message' => 'Selamat! Data berhasil di Update.'
-        ];
-        return response()->json($message);
-    //  return redirect()->back();
-        // return redirect()->route('satuan.index');
+        if($cek_lokasi == null && $cek_lokasi2 == null){
+            MasterLokasi::find($request->kode_lokasi)->update($request->all());
+
+            $message = [
+                'success' => true,
+                'title' => 'Update',
+                'message' => 'Data telah di Update.'
+            ];
+            return response()->json($message);
+        }else{
+            $message = [
+                'success' => false,
+                'title' => 'Update',
+                'message' => '['.$request->kode_lokasi.'] telah terikat dengan mobil / alat.'
+            ];
+            return response()->json($message);
+        }
+      
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Customer  $Customer
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(MasterLokasi $masterlokasi)
-    {
-        try {
+    public function hapus_lokasi()
+    {   
+        $kode_lokasi = request()->id;
+        $masterlokasi = MasterLokasi::find(request()->id);
+        $cek_lokasi = Mobil::where('kode_lokasi',$kode_lokasi)->first();
+        $cek_lokasi2 = Alat::where('kode_lokasi',$kode_lokasi)->first();
+
+        if ($cek_lokasi == null && $cek_lokasi2 == null){
             $masterlokasi->delete();
 
             $message = [
                 'success' => true,
                 'title' => 'Update',
-                'message' => 'Selamat! Data ['.$masterlokasi->nama_lokasi.'] berhasil dihapus.'
+                'message' => 'Data ['.$masterlokasi->nama_lokasi.'] telah dihapus.'
             ];
             return response()->json($message);
-
-        }catch (\Exception $exception){
+        } else {
             $message = [
                 'success' => false,
                 'title' => 'Update',
-                'message' => 'Maaf! Data gagal dihapus.'
+                'message' => 'Data ['.$masterlokasi->nama_lokasi.'] dipakai dalam transaksi.'
             ];
             return response()->json($message);
         }
-    
+        
     }
 }

@@ -1,25 +1,18 @@
 @extends('adminlte::page')
 
-@section('title', 'Edit Data')
+@section('title', 'User Edit')
 
 @section('content_header')
-    <h1>User Edit</h1>
 @stop
 
 @section('content')
+<body onLoad="load()">
     <div class="box">
         <div class="box-header with-border">
-            <h3 class="box-title">Edit User : {{ $user->email }}</h3>
-            <!-- /.box-tools -->
+            <a href="{{ $list_url }}" class="btn btn-light btn-xs pull-left"> <i class="fa fa-arrow-circle-left"></i> Kembali</a>
         </div>
-        <!-- /.box-header -->
-        <div class="box-body">
-            <div class="box box-info">
-                <div class="box-body">
-                    <a href="{{ $list_url }}" class="btn btn-default btn-sm">Lihat Data</a>
-                </div>
-            </div>
 
+        <div class="box-body">
 
             {!! Form::model($user, ['route' => ['users.update', $user->id],'method' => 'put']) !!}
 
@@ -29,9 +22,14 @@
                 </div>
 
                 <div class="form-group">
-                    {{ Form::label('email', 'Email:') }}
-                    {{ Form::text('email', null, ['class'=> 'form-control']) }}
+                    {{ Form::label('username', 'Username:') }}
+                    {{ Form::text('username', null, ['class'=> 'form-control','required'=>'required']) }}
                 </div>
+
+                <!--<div class="form-group">-->
+                <!--    {{ Form::label('email', 'Email:') }}-->
+                <!--    {{ Form::text('email', null, ['class'=> 'form-control']) }}-->
+                <!--</div>-->
 
                 <div class="form-group">
                     {{ Form::label('password', 'Password:') }}
@@ -39,22 +37,31 @@
                 </div>
 
                 <div class="form-group">
-                    {{ Form::label('password_confirmation', 'Password:') }}
+                    {{ Form::label('password_confirmation', 'Password Confirmation:') }}
                     {{ Form::password('password_confirmation', ['class'=> 'form-control']) }}
                 </div>
 
                 <div class="form-group">
                     {{ Form::label('roles', 'Roles:') }}
-                    {{ Form::select('roles[]', $roles , null, ['class'=> 'form-control','multiple']) }}
+                    {{ Form::select('roles[]', $roles, null, ['class'=> 'form-control select2','required'=>'required','style'=>'width: 100%','placeholder' => '']) }}
                 </div>
 
                 <div class="form-group">
                     {{ Form::label('kode_company', 'Company:') }}
-                    {{ Form::select('kode_company', $Company, null, ['class'=> 'form-control','required'=>'required']) }}
+                    {{ Form::select('kode_company', $Company, null, ['class'=> 'form-control select2','required'=>'required','style'=>'width: 100%','placeholder' => '']) }}
                 </div>
 
                 <div class="form-group">
-                    {{ Form::submit('Update data', ['class' => 'btn btn-success']) }}
+                    {{ Form::label('kode_lokasi', 'Lokasi:') }}
+                    {{ Form::select('kode_lokasi', $Lokasi, null, ['class'=> 'form-control select2','required'=>'required','style'=>'width: 100%','placeholder' => '']) }}
+                </div>
+
+                <div class="box-footer">
+                    <div class="row pull-right">
+                        <div class="col-md-12 ">
+                            {{ Form::submit('Update', ['class' => 'btn btn-success btn-sm']) }}
+                        </div>
+                    </div>
                 </div>
 
             {!! Form::close() !!}
@@ -62,5 +69,60 @@
         </div>
 
     </div>
-    <!-- /.box -->
+
+    <button type="button" class="back2Top btn btn-warning btn-xs" id="back2Top"><i class="fa fa-arrow-up" style="color: #fff"></i> <i>{{ $nama_company }}</i> <b>({{ $nama_lokasi }})</b></button>
+
+        <style type="text/css">
+            #back2Top {
+                width: 400px;
+                line-height: 27px;
+                overflow: hidden;
+                z-index: 999;
+                display: none;
+                cursor: pointer;
+                position: fixed;
+                bottom: 0;
+                text-align: left;
+                font-size: 15px;
+                color: #000000;
+                text-decoration: none;
+            }
+            #back2Top:hover {
+                color: #fff;
+            }
+        </style>
+</body>
 @stop
+
+@push('js')
+    <script>
+        $(window).scroll(function() {
+            var height = $(window).scrollTop();
+            if (height > 1) {
+                $('#back2Top').show();
+            } else {
+                $('#back2Top').show();
+            }
+        });
+        
+        $(document).ready(function() {
+            $("#back2Top").click(function(event) {
+                event.preventDefault();
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                return false;
+            });
+
+        });
+
+        function load(){
+            startTime();
+            $('.back2Top').show();
+        }
+
+        $('.select2').select2({
+            placeholder: "Pilih",
+            allowClear: true,
+
+        });
+    </script>
+@endpush

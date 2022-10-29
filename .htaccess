@@ -4,6 +4,9 @@
     </IfModule>
 
     RewriteEngine On
+    
+    RewriteRule .* - [E=noabort:1]
+    RewriteRule .* - [E=noconntimeout:1]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
@@ -18,4 +21,5 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
 </IfModule>

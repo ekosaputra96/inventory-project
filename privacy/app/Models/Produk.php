@@ -5,12 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Yajra\Auditable\AuditableTrait;
 use App\Models\KategoriProduk;
+use App\Models\Alat;
 use App\Models\Merek;
-use App\Models\Ukuran;
+use App\Models\Jenis;
+use App\Models\Jasa;
+use App\Models\Signature;
+use App\Models\JenisMobil;
+use App\Models\Catatanpo;
+use App\Models\Opname;
+use App\Models\ProdukCounter;
 use App\Models\satuan;
 use App\Models\Company;
 use App\Models\PermintaanDetail;
+use App\Models\PembelianDetail;
 use App\Models\MasterLokasi;
+use App\Models\Konversi;
+use DB;
+use Carbon;
 
 class Produk extends Model
 {
@@ -19,26 +30,61 @@ class Produk extends Model
 
     protected $table = 'produk';
 
-	protected $primaryKey = 'kode_produk';
+    protected $primaryKey = 'id';
 
-	public $incrementing = false;
+    public $incrementing = false;
 
-	protected $fillable = [
-    	'kode_produk',
+    protected $fillable = [
+        'id',
+        'kode_produk',
         'nama_produk',
+        'tipe_produk',
         'kode_kategori',
+        'kode_unit',
         'kode_merek',
         'kode_ukuran',
+        'kode_alat',
+        'kode_jasa',
+        'kode_tipe',
+        'no_opname',
+        'kode_signature',
+        'kode_jenis_mobil',
+        'nomor',
         'kode_satuan',
-        'type',
+        'partnumber',
         'harga_beli',
         'harga_jual',
         'hpp',
         'stok',
-        'aktif',
+        'stat',
+        'min_qty',
+        'max_qty',
         'kode_company',
-        'id_lokasi',
+        'kode_lokasi',
+        'kode_konversi',
     ];
+
+    public static function konek()
+    {
+        $compa2 = auth()->user()->kode_company;
+        $compa = substr($compa2,0,2);
+        if ($compa == '01'){
+            $koneksi = 'mysqldepo';
+        }else if ($compa == '02'){
+            $koneksi = 'mysqlpbm';
+        }else if ($compa == '03'){
+            $koneksi = 'mysqlemkl';
+        }else if ($compa == '22'){
+            $koneksi = 'mysqlskt';
+        }else if ($compa == '04'){
+            $koneksi = 'mysqlgut';
+        }else if ($compa == '05'){
+            $koneksi = 'mysql';
+        }else if ($compa == '06'){
+            $koneksi = 'mysqlinfra';
+        }
+        return $koneksi;
+    }
 
     public function PermintaanDetail()
     {
@@ -49,15 +95,70 @@ class Produk extends Model
     {
     return $this->hasMany(PemakaianDetail::class,'kode_satuan');
     }
+
+    public function PenerimaanDetail()
+    {
+    return $this->hasMany(PenerimaanDetail::class,'kode_satuan');
+    }
+
+    public function OpnameDetail()
+    {
+    return $this->hasMany(OpnameDetail::class,'kode_satuan');
+    }
     
     public function KategoriProduk()
     {
         return $this->belongsTo(KategoriProduk::class,'kode_kategori');
     }
 
+    public function Unit()
+    {
+        return $this->belongsTo(Unit::class,'kode_unit');
+    }
+
     public function Merek()
     {
         return $this->belongsTo(Merek::class,'kode_merek');
+    }
+
+    public function Konversi()
+    {
+    return $this->hasMany(Konversi::class,'kode_satuan');
+    }
+
+    public function Alat()
+    {
+        return $this->belongsTo(Alat::class,'kode_alat');
+    }
+
+    public function Jenis()
+    {
+        return $this->belongsTo(Alat::class,'kode_tipe');
+    }
+
+    public function Jasa()
+    {
+        return $this->belongsTo(Jasa::class,'kode_jasa');
+    }
+
+    public function Opname()
+    {
+        return $this->belongsTo(Opname::class,'no_opname');
+    }
+
+    public function Signature()
+    {
+        return $this->belongsTo(Signature::class,'kode_signature');
+    }
+
+    public function JenisMobil()
+    {
+        return $this->belongsTo(Signature::class,'kode_jenis_mobil');
+    }
+
+    public function Catatanpo()
+    {
+        return $this->belongsTo(Catatanpo::class,'nomor');
     }
 
     public function Ukuran()
@@ -70,6 +171,11 @@ class Produk extends Model
         return $this->belongsTo(satuan::class,'kode_satuan');
     }
 
+    public function pembeliandetail()
+    {
+        return $this->belongsTo(PembelianDetail::class,'qty');
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class,'kode_company');
@@ -77,101 +183,91 @@ class Produk extends Model
 
     public function MasterLokasi()
     {
-        return $this->belongsTo(MasterLokasi::class,'id_lokasi');
+        return $this->belongsTo(MasterLokasi::class,'kode_lokasi');
     }
 
      public function getDestroyUrlAttribute()
     {
-        return route('produk.destroy', $this->kode_produk);
+        return route('produk.destroy', $this->id);
     }
 
     public function getEditUrlAttribute()
     {
-        return route('produk.edit',$this->kode_produk);
+        return route('produk.edit',$this->id);
     }
 
     public function getShowUrlAttribute()
     {
-        return route('produk.show',$this->kode_produk);
+        return route('produk.show',$this->id);
     }
 
     public function getUpdateUrlAttribute()
     {
-        return route('produk.update',$this->kode_produk);
+        return route('produk.update',$this->id);
     }
-
-    // public static function boot()
-    // {
-    //     parent::boot();
-
-    //     static::creating(function ($query){
-    //        $query->id_lokasi = 5;
-    //     });
-    // }
 
     public static function boot()
     {
         parent::boot();
        
         static::creating(function ($query){
-           $query->kode_company = Auth()->user()->kode_company;
-           $query->kode_produk = static::generateKode(Auth()->user()->kode_company);
-           $query->id_lokasi = 1;
+            $query->kode_company = Auth()->user()->kode_company;
+            $query->kode_produk = static::generateNumber(request()->nama_produk);
+            $query->created_by = Auth()->user()->name;
+            $query->updated_by = Auth()->user()->name;
+        });
+
+        static::updating(function ($query){
+           $query->updated_by = Auth()->user()->name;
         });
     }
 
     public static function generateNumber($sumber_text)
     {
-
-        $lastRecort = self::orderBy('created_at', 'desc')->first();
-        $prefix = strtoupper($sumber_text) ;
+        $konek = static::konek();
+        $lastRecort = self::on($konek)->orderBy('kode_produk', 'desc')->first();
+        $prefix = strtoupper($sumber_text[0]) ;
         $primary_key = (new self)->getKeyName();
 
-        // dd($primary_key);
 
         if ( ! $lastRecort )
             $number = 0;
         else {
             $field = $lastRecort->{$primary_key} ;
-            if ($prefix[0] == $lastRecort->{$primary_key}[0]){
+            if (is_string($prefix) && $prefix[0] == is_string($field) && $field[0]){
                 $number = substr($field, 2);
             }else {
                 $number = 0;
             }
         }
 
-        return  $prefix . sprintf('%04d', intval($number) + 1);
-    }
+        if($prefix != null){
+            $produk_index = ProdukCounter::on($konek)->where('index', $prefix)->first();
+            if($produk_index != null){
+                $jumlah_final = $produk_index->jumlah + 1;
 
-    public static function generateKode($sumber_text)
-    {
-        
-        $primary_key = (new self)->getKeyName();
-        // $get_prefix_1 = $data->kode_company;
-        $get_prefix_2 = strtoupper($sumber_text);
-        $get_prefix_3 = date('my');
-        $prefix_result = $get_prefix_2.$get_prefix_3;
-        $prefix_result_length = strlen($prefix_result);
+                $tabel_baru2 = [
+                            'index'=>$prefix,
+                            'jumlah'=>$jumlah_final,
+                            ];
 
-        $lastRecort = Produk::where($primary_key,'like',$prefix_result.'%')->orderBy('created_at', 'desc')->first();
+                $update = ProdukCounter::on($konek)->where('index', $prefix)->update($tabel_baru2);
 
-        // dd($lastRecort->toArray());
+                return  $prefix . sprintf('%05d', intval($jumlah_final));
 
-        if ( ! $lastRecort )
-            $number = 0;
-        else {
-            $get_record_prefix = strtoupper(substr($lastRecort->{$primary_key}, 0,$prefix_result_length));
-            // dd($get_record_prefix, $prefix_result);
-            if ($get_record_prefix === $prefix_result){
-                $number = substr($lastRecort->{$primary_key},$prefix_result_length);
-            }else {
-                $number = 0;
             }
+            else{
+                $tabel_baru2 = [
+                            'index'=>$prefix,
+                            'jumlah'=>1,
+                            ];
 
+                $update = ProdukCounter::on($konek)->create($tabel_baru2);
+
+                return  $prefix . sprintf('%05d', intval($number) + 1);
+
+            }
+            
         }
-
-        $result_number = $prefix_result . sprintf('%03d', intval($number) + 1);
-
-        return $result_number ;
     }
 }

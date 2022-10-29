@@ -11,49 +11,60 @@ class MasterLokasi extends Model
 {
     //
     use AuditableTrait;
+    
+    protected $connection = 'mysql2';
 
     protected $table = 'master_lokasi';
 
-    protected $primaryKey = 'id_lokasi';
+    protected $primaryKey = 'kode_lokasi';
     
     public $incrementing = false;
 
-	protected $fillable = [
-    	'id_lokasi',
+    protected $fillable = [
+        'kode_lokasi',
         'nama_lokasi',
-        'nickname',
         'alamat',
         'status',
+        'level_lokasi',
     ];
-
-   
-    // public function Permintaan()
-    // {
-    //     return $this->belongsTo(Permintaan::class,'no_permintaan');
-    // }
 
     public function Produk()
     {
-    return $this->hasMany(Produk::class,'id_lokasi');
+    return $this->hasMany(Produk::class,'kode_lokasi');
     }
 
     public function getDestroyUrlAttribute()
     {
-        return route('masterlokasi.destroy', $this->id_lokasi);
+        return route('masterlokasi.destroy', $this->kode_lokasi);
     }
 
     public function getEditUrlAttribute()
     {
-        return route('masterlokasi.edit',$this->id_lokasi);
+        return route('masterlokasi.edit',$this->kode_lokasi);
     }
 
     public function getUpdateUrlAttribute()
     {
-        return route('masterlokasi.update',$this->id_lokasi);
+        return route('masterlokasi.update',$this->kode_lokasi);
     }
 
     public function getDetailUrlAttribute()
     {
-        return route('masterlokasi.detail',$this->id_lokasi);
+        return route('masterlokasi.detail',$this->kode_lokasi);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($query){
+            $query->kode_company = Auth()->user()->kode_company;
+            $query->created_by = Auth()->user()->name;
+            $query->updated_by = Auth()->user()->name;
+        });
+
+        static::updating(function ($query){
+           $query->updated_by = Auth()->user()->name;
+        });
     }
 }

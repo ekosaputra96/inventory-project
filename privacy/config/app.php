@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'id',
 
     /*
     |--------------------------------------------------------------------------
@@ -152,7 +152,7 @@ return [
         ConsoleTVs\Charts\ChartsServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
-
+        UxWeb\SweetAlert\SweetAlertServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -165,6 +165,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
 
@@ -217,7 +218,10 @@ return [
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
-
+        'Charts' => ConsoleTVs\Charts\Facades\Charts::class,
+        'Alert' => UxWeb\SweetAlert\SweetAlert::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Terbilang' => Riskihajar\Terbilang\Facades\Terbilang::class,
     ],
 
 ];
