@@ -64,15 +64,14 @@ class JasaController extends Controller
     public function store(Request $request)
     {
         $nama_item = $request->nama_item;
-        $cek_nama = Jasa::where('nama_item',$nama_item)->first();       
+        $cek_nama = Jasa::where('nama_item',$nama_item)->first();
         if ($cek_nama==null){
-            $Jasa = Jasa::create($request->all());
+            Jasa::create($request->all());
             $message = [
                 'success' => true,
                 'title' => 'Simpan',
                 'message' => 'Data telah di Disimpan.',
             ];
-            return response()->json($message);
         }
         else{
             $message = [
@@ -80,8 +79,8 @@ class JasaController extends Controller
                 'title' => 'Simpan',
                 'message' => 'Nama Item Sudah Ada',
             ];
-            return response()->json($message);
         }
+        return response()->json($message);
     }
 
 

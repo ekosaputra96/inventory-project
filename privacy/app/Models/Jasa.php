@@ -58,10 +58,12 @@ class Jasa extends Model
     public static function generateKode($sumber_text2)
     {
         $prefix = 'J';
-        $prefix2 = strtoupper($sumber_text2[0]);
+        $prefix2 = 'J'. strtoupper($sumber_text2[0]);
         $primary_key = (new self)->getKeyName();
 
-        $lastRecort = self::orderBy('kode_produk', 'desc')->first();
+        $lastRecort = self::where('kode_produk', 'like' , $prefix2.'%')->orderBy('created_at', 'desc')->first();
+
+        // dd($primary_key);
 
         if ( ! $lastRecort )
             $number = 0;

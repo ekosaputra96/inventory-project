@@ -327,6 +327,12 @@ return [
                     'icon' => 'hand-paper-o',
                     'permission'  => 'read-kasbon',
                 ],
+                [
+                    'text' => 'Permintaan Kasbon 1',
+                    'url' => 'admin/kasbon1',
+                    'icon' => 'hand-paper-o',
+                    'permission' => 'read-kasbon'
+                ],
                 
                 [
                     'text' => 'NPPB',

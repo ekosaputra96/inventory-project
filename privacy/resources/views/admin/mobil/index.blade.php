@@ -251,12 +251,12 @@
             
             <?php if(auth()->user()->kode_company == 02) {?>
             
-            @permission('update-mobilora')
+            @permission('update-mobilor')
             <a href="#" id="addlokasi"><button type="button" class="btn bg-black btn-xs add-button" data-toggle="modal" data-target="">EDIT LOKASI<i class="fa fa-plus"></i></button></a>
             <button type="button" class="btn btn-warning btn-xs edit-button" id="editmobil" data-toggle="modal" data-target="">EDIT <i class="fa fa-edit"></i></button>
             @endpermission
 
-            @permission('delete-mobilora')
+            @permission('delete-mobilor')
             <button type="button" class="btn btn-danger btn-xs hapus-button" id="hapusmobil" data-toggle="modal" data-target="">HAPUS <i class="fa fa-times-circle"></i></button>
             @endpermission
             

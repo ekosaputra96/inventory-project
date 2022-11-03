@@ -351,7 +351,7 @@
             $('#hapusbank').click( function () {
                 var select = $('.selected').closest('tr');
                 var data = $('#data-table').DataTable().row(select).data();
-                var kode_bank = data['kode_bank'];
+                var kode_bank = data['id'];
                 var row = table.row( select );
                 swal({
                     title: "Hapus?",

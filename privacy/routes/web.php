@@ -88,6 +88,13 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('kasbon/Unpost', 'KasbonController@Unpost')->name('kasbon.unpost');
     Route::resource('kasbon', 'KasbonController');
 
+    /**
+     * Permintaan Kasbon 1
+     */
+
+    Route::get('kasbon1/getkasbon', 'Kasbon1Controller@getKasbon')->name('kasbon1.getkasbon');
+    Route::resource('kasbon1', 'Kasbon1Controller');
+
      /**
      * Konversi
      */

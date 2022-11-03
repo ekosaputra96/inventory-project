@@ -122,14 +122,14 @@ class SetupaksesController extends Controller
     public function hapus_bank()
     {   
         $konek = self::konek();
-        $bank = Bank::find(request()->id);
-
+        $bank = SetupAkses::on($konek)->find(request()->id);
+        
         $bank->delete();
-
+        
         $message = [
             'success' => true,
             'title' => 'Update',
-            'message' => 'Data ['.$bank->nama_bank.'] telah dihapus.'
+            'message' => 'Data User telah dihapus.'
         ];
         return response()->json($message);
     }
