@@ -93,6 +93,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
      */
 
     Route::get('kasbon1/getkasbon', 'Kasbon1Controller@getKasbon')->name('kasbon1.getkasbon');
+    Route::post('kasbon1/postkasbon', 'Kasbon1Controller@postKasbon')->name('kasbon1.postkasbon');
+    Route::post('kasbon1/unpostkasbon', 'Kasbon1Controller@unpostKasbon')->name('kasbon1.unpostkasbon');
+    Route::post('kasbon1/approvedkasbon', 'Kasbon1Controller@approvedKasbon')->name('kasbon1.approvedkasbon');
     Route::resource('kasbon1', 'Kasbon1Controller');
 
      /**

@@ -83,6 +83,120 @@ class Kasbon1Controller extends Controller
         }
         return false;
     }
+
+    /**
+     * creating new user history to user_history table.
+     *
+     * 
+     */
+    public function createUserHistory(string $aksi, string $no_pkb) {
+        user_history::on($this->connection())->create([
+            'nama' => auth()->user()->name,
+            'aksi' => $aksi.' Kasbon No. Transfer: '.$no_pkb.'.',
+            'created_by' => auth()->user()->name,
+            'updated_by' => auth()->user()->name
+        ]);
+    }
+
+    /**
+     * creating new message for response.
+     *
+     * 
+     */
+    public function message(bool $success, string $title, string $msg){
+        return [
+            'success' => $success,
+            'title' => $title,
+            'message' => $msg
+        ];
+    }
+    
+    /**
+     * To approve the selected kasbon 'APPROVED'.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function approvedKasbon(Request $request){
+        // set init
+        $message = null;
+
+        // check if logged user is superadministrator
+        if(auth()->user()->level == 'superadministrator'){
+            // get the selected kasbon from database
+            $getKasbon = Kasbon::on($this->connection())->find($request->no_pkb);
+            
+            if($getKasbon->status == 'POSTED' && $getKasbon->status != 'OPEN'){
+                $getKasbon->status = 'APPROVED';
+                $getKasbon->save();
+
+                $message = $this->message(true, 'Berhasil', $request->no_pkb.' berhasil diapproved');
+            }else{
+                $message = $this->message(false, 'Gagal', $request->no_pkb.' masin open / sudah diapproved');
+            }
+        }else{
+            // if the logged in user is not superadministrator
+            $message = $this->message(false, 'Gagal', 'Not Authorized');
+        }
+        return response()->json($message);
+    }
+
+    /**
+     * To unpost the selected kasbon from 'POSTED' to 'OPEN'.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function unpostKasbon(Request $request){
+        // set init
+        $message = null;
+
+        // check if logged user is superadministrator
+        if(auth()->user()->level == 'superadministrator'){
+            // get the selected kasbon from database
+            $getKasbon = Kasbon::on($this->connection())->find($request->no_pkb);
+            
+            if($getKasbon->status == 'POSTED'){
+                $getKasbon->status = 'OPEN';
+                $getKasbon->save();
+
+                $message = $this->message(true, 'Berhasil', $request->no_pkb.' berhasil diunposting');
+            }else{
+                $message = $this->message(false, 'Gagal', $request->no_pkb.' sudah diunposting/approved');
+            }
+        }else{
+            // if the logged in user is not superadministrator
+            $message = $this->message(false, 'Gagal', 'Not Authorized');
+        }
+        return response()->json($message);
+    }
+    
+    /**
+     * To post the selected kasbon from 'OPEN' to 'POSTED'.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function postKasbon(Request $request){
+        // set init
+        $message = null;
+
+        // check if logged user is superadministrator
+        if(auth()->user()->level == 'superadministrator'){
+            // get the selected kasbon from database
+            $getKasbon = Kasbon::on($this->connection())->find($request->no_pkb);
+            
+            if($getKasbon->status == 'OPEN'){
+                $getKasbon->status = 'POSTED';
+                $getKasbon->save();
+
+                $message = $this->message(true, 'Berhasil', $request->no_pkb.' berhasil diposting');
+            }else{
+                $message = $this->message(false, 'Gagal', $request->no_pkb.' sudah diposting/approved');
+            }
+        }else{
+            // if the logged in user is not superadministrator
+            $message = $this->message(false, 'Gagal', 'Not Authorized');
+        }
+        return response()->json($message);
+    }
     
     /**
      * Display a listing of the resource.
@@ -122,7 +236,7 @@ class Kasbon1Controller extends Controller
     public function store(Request $request)
     {
         // init message
-        $message = [];
+        $message = null;
         // check if there is re-open
         $reopen = tb_akhir_bulan::on($this->connection())->where('reopen_status', 'true')->first();
 
@@ -132,9 +246,7 @@ class Kasbon1Controller extends Controller
             $reopenPeriode = Carbon::parse($reopen->periode)->format('Y-m');
 
             if($this->checkKasbon($reopenPeriode) >= 1){
-                $message['success'] = false;
-                $message['title'] = 'Gagal';
-                $message['message'] = 'Masih ada Transaksi PKB yang OPEN';
+                $message = $this->message(false, 'Gagal', 'Masih ada Transaksi PKB yang OPEN');
             }
         }else{
             // if re-open is null
@@ -144,9 +256,7 @@ class Kasbon1Controller extends Controller
             // format periode to tanggal permintaan
             $period = Carbon::parse($period)->format('Y-m');
             if($this->checkKasbon($period) >= 1){
-                $message['success'] = false;
-                $message['title'] = 'Gagal';
-                $message['message'] = 'Masih ada Transaksi PKB yang OPEN !';
+                $message = $this->message(false, 'Gagal', 'Masih ada Transaksi PKB yang OPEN');
             }
         }
 
@@ -164,20 +274,12 @@ class Kasbon1Controller extends Controller
             $no_pkb = Kasbon::on($this->connection())->select('no_pkb')->where('nama_pemohon', $request->nama_pemohon_add)->where('tanggal_permintaan', $request->tanggal_permintaan_add)->latest()->first()->no_pkb;
 
             // insert the action to user_history
-            user_history::on($this->connection())->create([
-                'nama' => auth()->user()->name,
-                'aksi' => 'Simpan Kasbon No. Transfer: '.$no_pkb.'.',
-                'created_by' => auth()->user()->name,
-                'updated_by' => auth()->user()->name
-            ]);
-            $message['success'] = true;
-            $message['title'] = 'Simpan';
-            $message['message'] = 'Data telah disimpan';
+            $this->createUserHistory('Simpan', $no_pkb);
+
+            $message = $this->message(true, 'Simpan', 'Data telah disimpan');
         }else if($this->periodeChecker($request->tanggal_permintaan_add) == false && $this->checkKasbon($period) == 0){
             // if not valid
-            $message['success'] = false;
-            $message['title'] = 'Gagal';
-            $message['message'] = 'Periode '. Carbon::parse($request->tanggal_permintaan_add)->format('F Y'). ' Telah ditutup / Belum dibuka';
+            $message = $this->message(false, 'Gagal', 'Periode '. Carbon::parse($request->tanggal_permintaan_add)->format('F Y'). ' Telah ditutup / Belum dibuka');
         }
         return response()->json($message);
     }
@@ -201,7 +303,9 @@ class Kasbon1Controller extends Controller
      */
     public function edit($id)
     {
-        //
+        // getting the kasbon data using $id (no_pkb)
+        $data = Kasbon::on($this->connection())->select('no_pkb', 'nama_pemohon', 'tanggal_permintaan', 'nilai', 'keterangan')->find($id);
+        return response()->json($data);
     }
 
     /**
@@ -213,7 +317,29 @@ class Kasbon1Controller extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // init message
+        $message = null;
+
+        // check the period of the tanggal_permintaan to tb_akhir_tahun
+        if($this->periodeChecker($request->tanggal_permintaan_edit)){
+            // updating the selected Kasbon
+            Kasbon::on($this->connection())->find($id)->update([
+                'nama_pemohon' => $request->nama_pemohon_edit,
+                'nilai' => $request->nilai_edit,
+                'tanggal_permintaan' => $request->tanggal_permintaan_edit,
+                'keterangan' => $request->keterangan_edit,
+            ]);
+
+            // creating user history
+            $this->createUserHistory('Edit', $id);
+
+            // send successfull message
+            $message = $this->message(true, 'Update', 'Data telah di update');
+        }else{
+            // if tanggal_permintaan and current period doesn't match
+            $message = $this->message(false, 'Gagal', 'Periode '.Carbon::parse($request->tanggal_permintaan_edit)->format('F Y').' telah ditutup / belum dibuka');
+        }
+        return response()->json($message);
     }
 
     /**
@@ -224,6 +350,26 @@ class Kasbon1Controller extends Controller
      */
     public function destroy($id)
     {
-        //
+        // init message
+        $message = null;
+
+        // get the selected kasbon from Kasbon table
+        $kasbon = Kasbon::on($this->connection())->find($id);
+
+        // check the period of the tanggal_permintaan to tb_akhir_tahun
+        if($this->periodeChecker($kasbon->tanggal_permintaan)){
+            // delete the Kasbon
+            $kasbon->delete();
+
+            // creating user history
+            $this->createUserHistory('Hapus', $id);
+
+            // generating message
+            $message = $this->message(true, 'Delete', 'Data '.$id.' telah dihapus');
+        }else{
+            // if the current periode and tanggal permintaan doesn't match
+            $message = $this->message(false, 'Gagal', 'Periode '.Carbon::parse($kasbon->tanggal_permintaan)->format('F Y').' telah ditutup / belum dibuka');
+        }
+        return response()->json($message);
     }
 }

@@ -43,6 +43,54 @@
                         </thead>
                     </table>
                 </div>
+
+                {{-- additional information about the selected row --}}
+
+                <div class="row" style="margin-top: 1.5rem">
+                    {{-- created by input with readonly --}}
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            {{ Form::label('created_by', 'Created By : ') }}
+                            {{ Form::text('created_by', null, [
+                                'class' => 'form-control',
+                                'readonly',
+                            ]) }}
+                        </div>
+                    </div>
+
+                    {{-- created at input with readonly --}}
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            {{ Form::label('created_at', 'Created At : ') }}
+                            {{ Form::text('created_at', null, [
+                                'class' => 'form-control',
+                                'readonly',
+                            ]) }}
+                        </div>
+                    </div>
+
+                    {{-- updated by input with readonly --}}
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            {{ Form::label('updated_by', 'Updated By : ') }}
+                            {{ Form::text('updated_by', null, [
+                                'class' => 'form-control',
+                                'readonly',
+                            ]) }}
+                        </div>
+                    </div>
+
+                    {{-- updated at input with readonly --}}
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            {{ Form::label('updated_at', 'Updated At : ') }}
+                            {{ Form::text('updated_at', null, [
+                                'class' => 'form-control',
+                                'readonly',
+                            ]) }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="mySidenav">
@@ -51,7 +99,7 @@
             <button class="btn btn-danger btn-xs sidenav-item sidenav-item-open" id="kasbon-hapus-button"><i class="fa fa-times-circle"></i> Hapus</button>
             <button class="btn btn-success btn-xs sidenav-item sidenav-item-posted" id="kasbon-approve-button"><i class="fa fa-bullhorn"></i> Approve</button>
             <button class="btn btn-warning btn-xs sidenav-item sidenav-item-posted" id="kasbon-unpost-button"><i class="fa fa-undo"></i> Unpost</button>
-            <button class="btn btn-danger btn-xs sidenav-item sidenav-item-posted sidenav-item-approve" id="kasbon-print-button"><i class="fa fa-print"></i> Print</button>
+            <a href="#printkasbon" target="_blank" id="kasbon-print-button"><button class="btn btn-danger btn-xs sidenav-item sidenav-item-posted sidenav-item-approve" ><i class="fa fa-print"></i> Print</button></a>
         </div>
     </body>
 
@@ -142,6 +190,97 @@
             </div>
         </div>
     </div>
+
+    {{-- modal for kasbon editform --}}
+    <div class="modal fade" id="kasbon-editform" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                {{-- the header of the modal --}}
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Edit Data Kasbon</h4>
+                </div>
+
+                @include('errors.validation')
+                {{-- the body of the modal --}}
+                {{Form::open(['id' => 'EDIT'])}}
+                <div class="modal-body">
+                    <div class="row">
+                        {{-- hidden no_pkb edit --}}
+                        {{Form::hidden('no_pkb_edit', null, [
+                            'id' => 'no_pkb_edit'
+                        ])}}
+
+                        {{-- tanggal permintaan edit --}}
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{Form::label('tanggal_permintaan_edit', 'Tanggal PKB :')}}
+                                {{Form::date('tanggal_permintaan_edit', null, [
+                                    'class' => 'form-control',
+                                    'required'
+                                ])}}
+                            </div>
+                        </div>
+
+                        {{-- nama pemohon edit --}}
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{Form::label('nama_pemohon_edit', 'Nama Pemohon :')}}
+                                {{Form::text('nama_pemohon_edit', null, [
+                                    'class' => 'form-control',
+                                    'required',
+                                    'placeholder' => 'Nama Pemohon...',
+                                    'oninput' => 'autoCaps(this)',
+                                    'autocomplete' => 'off'
+                                ])}}
+                            </div>
+                        </div>
+
+                        {{-- nilai edit --}}
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{Form::label('nilai_edit', 'Jumlah Nominal :')}}
+                                {{Form::number('nilai_edit', null, [
+                                    'class' => 'form-control',
+                                    'required',
+                                    'placeholder' => 'Jumlah Nominal...',
+                                    'autocomplete' => 'off'
+                                ])}}
+                            </div>
+                        </div>
+
+                        {{-- keterangan --}}
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{Form::label('keterangan_edit', 'Keterangan : ')}}
+                                {{Form::textarea('keterangan_edit', null, [
+                                    'class' => 'form-control',
+                                    'rows' => 3,
+                                    'autocomplete' => 'off',
+                                    'placeholder' => 'Keterangan...'
+                                ])}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        {{Form::submit('Update', [
+                            'class' => 'btn btn-success'
+                        ])}}
+                        {{Form::button('Close', [
+                            'class' => 'btn btn-danger',
+                            'data-dismiss' => 'modal'
+                        ])}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </div>
+                </div>
+                {{Form::close()}}
+            </div>
+        </div>
+    </div>
 @stop
 
 @push('css')
@@ -192,6 +331,8 @@
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
+                'scrollY': 270,
+                'scrollX': 400,
                 ajax: '{{ route('kasbon1.getkasbon') }}',
                 fnRowCallback: function(row, data, index){
                     // console.log(.text())
@@ -232,16 +373,23 @@
         // when document is ready
         $(document).ready(function() {
             const table = $('#data-table').DataTable();
+
             $('#data-table tbody').on('dblclick', 'tr', function() {
                 // if the selected row has the class, remove it
                 if($(this).hasClass('selected bg-gray text-bold')){
                     $(this).removeClass('selected bg-gray text-bold')
                     $('.sidenav-item').hide();
+                    $('#created_by').val('');
+                    $('#created_at').val('');
+                    $('#updated_by').val('');
+                    $('#updated_at').val('');
                 }else{
                     // if not, remove selected class from table then add selected class
                     table.$('tr').removeClass('selected bg-gray text-bold');
                     $('.sidenav-item').hide();
                     $(this).addClass('selected bg-gray text-bold')
+
+                    // action buttons according to the status value
                     if($(this).find('td:last').text() == 'OPEN'){
                         // sidenav-item margin-top
                         let marginTop = 0;
@@ -267,11 +415,233 @@
                         })
                         $('.sidenav-item-approve').show();
                     }
+
+                    // getting data from table to fill additional information (created_at, created_by etc)
+                    // set the selected row
+                    const selectedRow = $('.selected').closest('tr');
+
+                    const data = table.row(selectedRow).data();
+                    $('#created_by').val(data['created_by'])
+                    $('#created_at').val(data['created_at'])
+                    $('#updated_by').val(data['updated_by'])
+                    $('#updated_at').val(data['updated_at'])
                 }
+            })
+
+            // edit data kasbon
+            $('#kasbon-edit-button').click(function() {
+                const rowId = getRowId(table);
+                $.ajax({
+                    url: '{{route('kasbon1.index')}}/' + rowId + '/edit',
+                    type: 'GET',
+                    success: function(data) {
+                        $('#no_pkb_edit').val(data.no_pkb);
+                        $('#tanggal_permintaan_edit').val(data.tanggal_permintaan);
+                        $('#nama_pemohon_edit').val(data.nama_pemohon);
+                        $('#nilai_edit').val(data.nilai);
+                        $('#keterangan_edit').val(data.keterangan);
+                        $('#kasbon-editform').modal('show');
+                    }
+                })
+            })
+
+            // hapus data kasbon
+            $('#kasbon-hapus-button').click(function() {
+                // getting rowId
+                const rowId = getRowId(table);
+
+                // confirmation button for deleting selected kasbon
+                swal({
+                    title: 'Hapus',
+                    text: 'Yakin akan menghapus '+ rowId +' ?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal'
+                }).then(function(e) {
+                    if(e.value === true){
+                        $.ajax({
+                            url: '{{route('kasbon1.index')}}/' + rowId,
+                            type: 'DELETE',
+                            success: function(data) {
+                                if(data.success === true){
+                                    swal(data.title, data.message, 'success')
+                                }else{
+                                    swal(data.title, data.message, 'error')
+                                }
+                                refreshTable(false);
+                                $('.sidenav-item').hide();
+                            }
+                        })
+                    }
+                })
+            })
+
+            // post data kasbon
+            $('#kasbon-post-button').click(function() {
+                const rowId = getRowId(table);
+                swal({
+                    title: 'Post',
+                    text: 'Yakin akan post ' + rowId + ' ?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Ya, Posting',
+                    cancelButtonText: 'Batal'
+                }).then(function(e) {
+                    if(e.value === true){
+                        // loading notification
+                        swal({
+                            title: 'Loading',
+                            text: 'Please, wait for a moment...',
+                            type: 'warning',
+                            showCancelButton: false,
+                            showConfirmButton: false
+                        })
+
+                        // sending request to the server
+                        $.ajax({
+                            url: '{{route('kasbon1.postkasbon')}}',
+                            type: 'POST',
+                            data: {
+                                'no_pkb': rowId,
+                            },
+                            success: function(data){
+                                if(data.success === true){
+                                    swal(data.title, data.message, 'success');
+                                }else{
+                                    swal(data.title, data.message, 'error');
+                                }
+                                refreshTable(false);
+                                $('.sidenav-item').hide();
+                            },
+                            error: function() {
+                                swal({
+                                    title: 'Opss... something wrong',
+                                    type: 'error',
+                                    timer: '1000'
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+
+            // unpost data kasbon
+            $('#kasbon-unpost-button').click(function() {
+                const rowId = getRowId(table);
+                swal({
+                    title: 'Unpost',
+                    text: 'Yakin akan unpost ' + rowId + ' ?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Ya, Unposting',
+                    cancelButtonText: 'Batal'
+                }).then(function(e) {
+                    if(e.value === true){
+                        // loading notification
+                        swal({
+                            title: 'Loading',
+                            text: 'Please, wait for a moment...',
+                            type: 'warning',
+                            showCancelButton: false,
+                            showConfirmButton: false
+                        })
+
+                        // sending request to the server
+                        $.ajax({
+                            url: '{{route('kasbon1.unpostkasbon')}}',
+                            type: 'POST',
+                            data: {
+                                'no_pkb': rowId,
+                            },
+                            success: function(data){
+                                if(data.success === true){
+                                    swal(data.title, data.message, 'success');
+                                }else{
+                                    swal(data.title, data.message, 'error');
+                                }
+                                refreshTable(false);
+                                $('.sidenav-item').hide();
+                            },
+                            error: function() {
+                                swal({
+                                    title: 'Opss... something wrong',
+                                    type: 'error',
+                                    timer: '1000'
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+
+            // approve data kasbon
+            $('#kasbon-approve-button').click(function() {
+                const rowId = getRowId(table);
+                swal({
+                    title: 'Approved',
+                    text: 'Yakin akan approved ' + rowId + ' ?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Ya, Approved',
+                    cancelButtonText: 'Batal'
+                }).then(function(e) {
+                    if(e.value === true){
+                        // loading notification
+                        swal({
+                            title: 'Loading',
+                            text: 'Please, wait for a moment...',
+                            type: 'warning',
+                            showCancelButton: false,
+                            showConfirmButton: false
+                        })
+
+                        // sending request to the server
+                        $.ajax({
+                            url: '{{route('kasbon1.approvedkasbon')}}',
+                            type: 'POST',
+                            data: {
+                                'no_pkb': rowId,
+                            },
+                            success: function(data){
+                                if(data.success === true){
+                                    swal(data.title, data.message, 'success');
+                                }else{
+                                    swal(data.title, data.message, 'error');
+                                }
+                                refreshTable(false);
+                                $('.sidenav-item').hide();
+                            },
+                            error: function() {
+                                swal({
+                                    title: 'Opss... something wrong',
+                                    type: 'error',
+                                    timer: '1000'
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+
+            // print data kasbon
+            $('#kasbon-print-button').click(function() {
+                const rowId = getRowId(table);
+                $('#kasbon-print-button').attr('href', '{{route('kasbon1.index')}}/exportpdf/' + rowId);
             })
         })
 
-        // ADD for submitting
+        // getting row id
+        function getRowId(table) {
+            const selectedRow = $('.selected').closest('tr');
+            return table.row(selectedRow).data()['no_pkb'];
+        }
+
+        // submitting the ADD form
         $('#ADD').submit(function(e) {
             e.preventDefault();
             const data = $('#ADD').serialize();
@@ -296,10 +666,41 @@
             })
         })
 
+        // submitting the EDIT form
+        $('#EDIT').submit(function(e) {
+            e.preventDefault();
+            // set no_pkb
+            const no_pkb = $('#no_pkb_edit').val();
+            const data = $('#EDIT').serialize();
+            $.ajax({
+                url: '{{route('kasbon1.index')}}/' + no_pkb,
+                type: 'PUT',
+                data: data,
+                success: function(data) {
+                    refreshTable(false);
+                    $('#kasbon-editform').modal('hide');
+                    $('#no_pkb_edit').val('');
+                    $('#tanggal_permintaan_edit').val('');
+                    $('#nama_pemohon_edit').val('');
+                    $('#nilai_edit').val('');
+                    $('#keterangan_edit').val('');
+                    $('.sidenav-item').hide();
+                    if(data.success === true){
+                        swal(data.title, data.message, 'success');
+                    }else{
+                        swal(data.title, data.message, 'error');
+                    }
+                }
+            })
+        })
+
         // reload the datatables
-        function refreshTable() {
+        function refreshTable(notif = true) {
             $('#data-table').DataTable().ajax.reload(null, false)
-            $.notify('Data is upto-date')
+            if(notif){
+                $.notify('Data is upto-date')
+            }
+            $('.sidenav-item').hide();
         }
 
         // rupiah formatter
