@@ -96,6 +96,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('kasbon1/postkasbon', 'Kasbon1Controller@postKasbon')->name('kasbon1.postkasbon');
     Route::post('kasbon1/unpostkasbon', 'Kasbon1Controller@unpostKasbon')->name('kasbon1.unpostkasbon');
     Route::post('kasbon1/approvedkasbon', 'Kasbon1Controller@approvedKasbon')->name('kasbon1.approvedkasbon');
+    Route::get('kasbon1/exportpdf/{id_pkb}', 'Kasbon1Controller@exportPdf')->name('kasbon1.exportpdf');
     Route::resource('kasbon1', 'Kasbon1Controller');
 
      /**

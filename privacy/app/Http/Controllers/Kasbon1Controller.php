@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kasbon;
-use App\Models\MasterLokasi;
-use App\Models\tb_akhir_bulan;
-use App\Models\user_history;
 use Carbon\Carbon;
+use App\Models\Kasbon;
+use App\Models\Company;
+use App\Models\MasterLokasi;
+use App\Models\user_history;
 use Illuminate\Http\Request;
+use App\Models\tb_akhir_bulan;
+use PDF;
 use Yajra\DataTables\DataTables;
 
 class Kasbon1Controller extends Controller
@@ -46,6 +48,15 @@ class Kasbon1Controller extends Controller
                 break;
         }
         return $connection;
+    }
+
+    /**
+     * return formatted date.
+     *
+     * 
+     */
+    public function formatDate(string $tgl){
+        return \Carbon\Carbon::parse($tgl)->format('d F Y');
     }
 
     /**
@@ -138,6 +149,33 @@ class Kasbon1Controller extends Controller
             $message = $this->message(false, 'Gagal', 'Not Authorized');
         }
         return response()->json($message);
+    }
+
+    /**
+     * To export kasbon to pdf file.
+     *
+     * @return \Illuminate\Http\Response
+     */
+
+    public function exportPdf($id_pkb){
+
+        // get the kasbon according to $id_pkb
+        $kasbon = Kasbon::on($this->connection())->find($id_pkb);
+
+        if($kasbon == null){
+            return redirect(route('kasbon1.index'));
+        }
+
+        // get lokasi name according to logged in user from masterlokasi table
+        $get_nama_lokasi = MasterLokasi::select('nama_lokasi')->find(auth()->user()->kode_lokasi)->nama_lokasi;
+
+        // get company name according to logged in user from Company table
+        $get_nama_company = Company::select('nama_company')->find(auth()->user()->kode_company)->nama_company;
+
+        // format tanggal permintaan
+        $tanggal_permintaan_format = $this->formatDate($kasbon->tanggal_permintaan);
+
+        return PDF::loadView('/admin/kasbon1/pdf', compact('kasbon', 'get_nama_lokasi', 'get_nama_company', 'tanggal_permintaan_format'))->setPaper([0, 0, 684, 792], 'potrait')->stream('Permintaan_Kasbon_'.$id_pkb.'.pdf');
     }
 
     /**
@@ -292,7 +330,25 @@ class Kasbon1Controller extends Controller
      */
     public function show($id)
     {
-        //
+        // getting nama lokasi from MasterLokasi
+        $nama_lokasi = MasterLokasi::select('nama_lokasi')->where('kode_lokasi', auth()->user()->kode_lokasi)->first()->nama_lokasi;
+
+        // getting period from tb_akhir_bulan
+        $period = tb_akhir_bulan::on($this->connection())->select('periode')->where('status_periode', 'Open')->orWhere('reopen_status', 'true')->first()->periode;
+
+        $period = Carbon::parse($period)->format('F Y');
+
+        // get the kasbon according to $id_pkb
+        $kasbon = Kasbon::on($this->connection())->find($id);
+
+        if($kasbon == null){
+            return redirect(route('kasbon1.index'));
+        }
+
+        // format tanggal permintaan
+        $tanggal_permintaan_format = $this->formatDate($kasbon->tanggal_permintaan);
+
+        return view('admin.kasbon1.detail', compact('nama_lokasi', 'period', 'kasbon', 'tanggal_permintaan_format'));
     }
 
     /**

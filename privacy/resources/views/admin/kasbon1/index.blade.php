@@ -347,6 +347,11 @@
                 columns: [
                     {
                         data: 'no_pkb',
+                        "fnCreatedCell": function(nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html("<a href='{{ route('kasbon1.index') }}/" + oData
+                                .no_pkb + "'>" + oData
+                                .no_pkb + "</a>")
+                        }
                     },
                     {
                         data: 'nama_pemohon'
