@@ -360,7 +360,7 @@ class Kasbon1Controller extends Controller
     public function edit($id)
     {
         // getting the kasbon data using $id (no_pkb)
-        $data = Kasbon::on($this->connection())->select('no_pkb', 'nama_pemohon', 'tanggal_permintaan', 'nilai', 'keterangan')->find($id);
+        $data = Kasbon::on($this->connection())->select('no_pkb', 'nama_pemohon', 'tanggal_permintaan', 'nilai', 'keterangan', 'created_at', 'updated_at', 'created_by', 'updated_by')->find($id);
         return response()->json($data);
     }
 
