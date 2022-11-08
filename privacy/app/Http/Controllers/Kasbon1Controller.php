@@ -10,6 +10,7 @@ use App\Models\user_history;
 use Illuminate\Http\Request;
 use App\Models\tb_akhir_bulan;
 use PDF;
+use Terbilang;
 use Yajra\DataTables\DataTables;
 
 class Kasbon1Controller extends Controller
@@ -256,6 +257,17 @@ class Kasbon1Controller extends Controller
     }
 
     /**
+     * return terbilang to client.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function terbilang($angka){
+        return response()->json([
+            'terbilang' => ucwords(Terbilang::make(intval($angka), ' rupiah'))
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -345,10 +357,7 @@ class Kasbon1Controller extends Controller
             return redirect(route('kasbon1.index'));
         }
 
-        // format tanggal permintaan
-        $tanggal_permintaan_format = $this->formatDate($kasbon->tanggal_permintaan);
-
-        return view('admin.kasbon1.detail', compact('nama_lokasi', 'period', 'kasbon', 'tanggal_permintaan_format'));
+        return view('admin.kasbon1.detail', compact('nama_lokasi', 'period', 'kasbon'));
     }
 
     /**
@@ -360,7 +369,7 @@ class Kasbon1Controller extends Controller
     public function edit($id)
     {
         // getting the kasbon data using $id (no_pkb)
-        $data = Kasbon::on($this->connection())->select('no_pkb', 'nama_pemohon', 'tanggal_permintaan', 'nilai', 'keterangan', 'created_at', 'updated_at', 'created_by', 'updated_by')->find($id);
+        $data = Kasbon::on($this->connection())->select('no_pkb', 'nama_pemohon', 'tanggal_permintaan', 'status', 'nilai', 'keterangan', 'created_at', 'updated_at', 'created_by', 'updated_by')->find($id);
         return response()->json($data);
     }
 
